@@ -14,6 +14,9 @@ reset.o: reset.s
 asm4c.o: asm4c.s
 	$(CA65) asm4c.s
 
+screen_utils.s: screen_utils.c
+
+
 $(NAME).o: $(NAME).s
 	$(CA65) $(NAME).s
 

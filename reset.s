@@ -2,10 +2,10 @@
 
 	.import _main
 	.export __STARTUP__:absolute=1
-	.import _NMI_flag, _Frame_Count
+	.importzp _NMI_flag, _Frame_Count
 
 ; Linker generated symbols
-	.import __STACK_START__, __STACKSIZE__
+	.import __STACK_START__, __STACK_SIZE__
     .include "zeropage.inc"
 	.import initlib, copydata
 
@@ -73,9 +73,9 @@ MusicInit:			;turns music channels off
 	lda #0
 	sta $4015
 	
-	lda #<(__STACK_START__+__STACKSIZE__)
+	lda #<(__STACK_START__+__STACK_SIZE__)
     sta	sp
-    lda	#>(__STACK_START__+__STACKSIZE__)
+    lda	#>(__STACK_START__+__STACK_SIZE__)
     sta	sp+1            ; Set the c stack pointer
 	
 	jsr	copydata
@@ -173,4 +173,4 @@ irq:
 
 .segment "CHARS"
 
-	.incbin "1sprite.chr"
+	.incbin "lesson7.chr"
