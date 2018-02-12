@@ -11,17 +11,40 @@
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
 	.forceimport	__STARTUP__
-	.export		_index
 	.export		_NMI_flag
 	.export		_Frame_Count
+	.export		_index
+	.export		_index4
 	.export		_Text_Position
+	.export		_X_POS
+	.export		_Y_POS
+	.export		_move
+	.export		_move4
+	.export		_move_count
+	.export		_state
+	.export		_state4
+	.export		_joypad1
+	.export		_joypad1old
+	.export		_joypad1test
+	.export		_joypad2
+	.export		_joypad2old
+	.export		_joypad2test
+	.export		_SPRITES
 	.export		_TEXT
 	.export		_PALETTE
+	.export		_ATTR_TABLE
+	.export		_MetaSprite_Y
+	.export		_MetaSprite_X
+	.export		_MetaSprite_Attr
+	.export		_MetaSprite_Tile
 	.export		_screen_off
 	.export		_screen_on
-	.export		_load_palette
 	.export		_reset_scroll
+	.export		_load_palette
 	.export		_load_text_increment
+	.export		_update_sprites
+	.import		_Get_Input
+	.export		_movement_logic
 	.export		_main
 
 .segment	"RODATA"
@@ -30,25 +53,137 @@ _TEXT:
 	.byte	$44,$6F,$6E,$74,$20,$74,$65,$6C,$6C,$20,$6D,$65,$20,$49,$20,$63
 	.byte	$61,$6E,$74,$20,$70,$62,$75,$69,$00
 _PALETTE:
-	.byte	$1F
+	.byte	$19
 	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$19
+	.byte	$37
+	.byte	$24
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+_ATTR_TABLE:
+	.byte	$44
+	.byte	$BB
+	.byte	$44
+	.byte	$BB
+_MetaSprite_Y:
+	.byte	$00
+	.byte	$00
+	.byte	$08
+	.byte	$08
+_MetaSprite_X:
+	.byte	$00
+	.byte	$08
+	.byte	$00
+	.byte	$08
+_MetaSprite_Attr:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+_MetaSprite_Tile:
+	.byte	$02
+	.byte	$03
+	.byte	$12
+	.byte	$13
+	.byte	$00
+	.byte	$01
 	.byte	$10
-	.byte	$20
+	.byte	$11
+	.byte	$06
+	.byte	$07
+	.byte	$16
+	.byte	$17
+	.byte	$04
+	.byte	$05
+	.byte	$14
+	.byte	$15
 
 .segment	"BSS"
 
-.segment	"BSS"
-_index:
-	.res	1,$00
-.segment	"BSS"
+.segment	"ZEROPAGE"
+.segment	"OAM"
+.segment	"ZEROPAGE"
 _NMI_flag:
 	.res	1,$00
-.segment	"BSS"
+.segment	"ZEROPAGE"
 _Frame_Count:
 	.res	1,$00
-.segment	"BSS"
+.segment	"ZEROPAGE"
+_index:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_index4:
+	.res	1,$00
+.segment	"ZEROPAGE"
 _Text_Position:
 	.res	1,$00
+.segment	"ZEROPAGE"
+_X_POS:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_Y_POS:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_move:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_move4:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_move_count:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_state:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_state4:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_joypad1:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_joypad1old:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_joypad1test:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_joypad2:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_joypad2old:
+	.res	1,$00
+.segment	"ZEROPAGE"
+_joypad2test:
+	.res	1,$00
+.segment	"OAM"
+_SPRITES:
+	.res	256,$00
 
 ; ---------------------------------------------------------------
 ; void __near__ screen_off (void)
@@ -104,51 +239,6 @@ _Text_Position:
 .endproc
 
 ; ---------------------------------------------------------------
-; void __near__ load_palette (void)
-; ---------------------------------------------------------------
-
-.segment	"CODE"
-
-.proc	_load_palette: near
-
-.segment	"CODE"
-
-;
-; PPU_ADDR = 0x3f; // set write address in the PPU to 0x3f00
-;
-	lda     #$3F
-	sta     $2006
-;
-; PPU_ADDR = 0x00;
-;
-	lda     #$00
-	sta     $2006
-;
-; for (index = 0; index < sizeof(PALETTE); ++index){
-;
-	sta     _index
-L0071:	lda     _index
-	cmp     #$04
-	bcs     L002F
-;
-; PPU_DATA = PALETTE[index]; // writes Palette data to 0x3f00, then increments
-;
-	ldy     _index
-	lda     _PALETTE,y
-	sta     $2007
-;
-; for (index = 0; index < sizeof(PALETTE); ++index){
-;
-	inc     _index
-	jmp     L0071
-;
-; reset_scroll();
-;
-L002F:	jmp     _reset_scroll
-
-.endproc
-
-; ---------------------------------------------------------------
 ; void __near__ reset_scroll (void)
 ; ---------------------------------------------------------------
 
@@ -183,6 +273,80 @@ L002F:	jmp     _reset_scroll
 .endproc
 
 ; ---------------------------------------------------------------
+; void __near__ load_palette (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_load_palette: near
+
+.segment	"CODE"
+
+;
+; PPU_ADDR = 0x3f; // set write address in the PPU to 0x3f00
+;
+	lda     #$3F
+	sta     $2006
+;
+; PPU_ADDR = 0x00; // this is the address for background colors
+;
+	lda     #$00
+	sta     $2006
+;
+; for (index = 0; index < sizeof(PALETTE); ++index){
+;
+	sta     _index
+L010B:	lda     _index
+	cmp     #$20
+	bcs     L010C
+;
+; PPU_DATA = PALETTE[index]; // writes Palette data to 0x3f00, then increments
+;
+	ldy     _index
+	lda     _PALETTE,y
+	sta     $2007
+;
+; for (index = 0; index < sizeof(PALETTE); ++index){
+;
+	inc     _index
+	jmp     L010B
+;
+; PPU_ADDR = 0x23; // set write address to where we want to load our color palettes
+;
+L010C:	lda     #$23
+	sta     $2006
+;
+; PPU_ADDR = 0xda;
+;
+	lda     #$DA
+	sta     $2006
+;
+; for (index = 0; index < sizeof(ATTR_TABLE); ++index) {
+;
+	lda     #$00
+	sta     _index
+L010D:	lda     _index
+	cmp     #$04
+	bcs     L007C
+;
+; PPU_DATA = ATTR_TABLE[index];
+;
+	ldy     _index
+	lda     _ATTR_TABLE,y
+	sta     $2007
+;
+; for (index = 0; index < sizeof(ATTR_TABLE); ++index) {
+;
+	inc     _index
+	jmp     L010D
+;
+; reset_scroll();
+;
+L007C:	jmp     _reset_scroll
+
+.endproc
+
+; ---------------------------------------------------------------
 ; void __near__ load_text_increment (void)
 ; ---------------------------------------------------------------
 
@@ -197,18 +361,18 @@ L002F:	jmp     _reset_scroll
 ;
 	lda     _Text_Position
 	cmp     #$19
-	bcs     L0072
+	bcs     L010E
 ;
 ; PPU_ADDR = 0x21; // location address on the screen to write
 ;
 	lda     #$21
 	sta     $2006
 ;
-; PPU_ADDR = 0xc5 + Text_Position;
+; PPU_ADDR = 0xc4 + Text_Position;
 ;
 	lda     _Text_Position
 	clc
-	adc     #$C5
+	adc     #$C4
 	sta     $2006
 ;
 ; PPU_DATA = TEXT[Text_Position];
@@ -227,7 +391,7 @@ L002F:	jmp     _reset_scroll
 ;
 ; Text_Position = 0;
 ;
-L0072:	lda     #$00
+L010E:	lda     #$00
 	sta     _Text_Position
 ;
 ; PPU_ADDR = 0x21;
@@ -235,18 +399,18 @@ L0072:	lda     #$00
 	lda     #$21
 	sta     $2006
 ;
-; PPU_ADDR = 0xc5;
+; PPU_ADDR = 0xc4;
 ;
-	lda     #$C5
+	lda     #$C4
 	sta     $2006
 ;
 ; for (index = 0; index < sizeof(TEXT); ++index) {
 ;
 	lda     #$00
 	sta     _index
-L0073:	lda     _index
+L010F:	lda     _index
 	cmp     #$19
-	bcs     L0065
+	bcs     L00A5
 ;
 ; PPU_DATA = 0;
 ;
@@ -256,11 +420,221 @@ L0073:	lda     _index
 ; for (index = 0; index < sizeof(TEXT); ++index) {
 ;
 	inc     _index
-	jmp     L0073
+	jmp     L010F
 ;
 ; reset_scroll();
 ;
-L0065:	jmp     _reset_scroll
+L00A5:	jmp     _reset_scroll
+
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ update_sprites (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_update_sprites: near
+
+.segment	"CODE"
+
+;
+; index4 = 0;
+;
+	lda     #$00
+	sta     _index4
+;
+; move4 = state << 2;
+;
+	lda     _state
+	asl     a
+	asl     a
+	sta     _move4
+;
+; for (index = 0; index < 4; ++index) {
+;
+	lda     #$00
+	sta     _index
+L0113:	lda     _index
+	cmp     #$04
+	bcc     L0114
+;
+; }
+;
+	rts
+;
+; SPRITES[index4] = MetaSprite_Y[index] + Y_POS; // relative y + master y
+;
+L0114:	lda     #<(_SPRITES)
+	ldx     #>(_SPRITES)
+	clc
+	adc     _index4
+	bcc     L00C0
+	inx
+L00C0:	sta     ptr1
+	stx     ptr1+1
+	ldy     _index
+	lda     _MetaSprite_Y,y
+	clc
+	adc     _Y_POS
+	ldy     #$00
+	sta     (ptr1),y
+;
+; ++index4;
+;
+	inc     _index4
+;
+; SPRITES[index4] = MetaSprite_Tile[index + move4]; // tile number switch
+;
+	lda     #<(_SPRITES)
+	ldx     #>(_SPRITES)
+	clc
+	adc     _index4
+	bcc     L00C7
+	inx
+L00C7:	sta     sreg
+	stx     sreg+1
+	ldx     #$00
+	lda     _index
+	clc
+	adc     _move4
+	bcc     L0111
+	inx
+L0111:	sta     ptr1
+	txa
+	clc
+	adc     #>(_MetaSprite_Tile)
+	sta     ptr1+1
+	ldy     #<(_MetaSprite_Tile)
+	lda     (ptr1),y
+	ldy     #$00
+	sta     (sreg),y
+;
+; ++index4;
+;
+	inc     _index4
+;
+; SPRITES[index4] = MetaSprite_Attr[index]; // change attributes
+;
+	lda     #<(_SPRITES)
+	ldx     #>(_SPRITES)
+	clc
+	adc     _index4
+	bcc     L00CD
+	inx
+L00CD:	sta     ptr1
+	stx     ptr1+1
+	ldy     _index
+	lda     _MetaSprite_Attr,y
+	ldy     #$00
+	sta     (ptr1),y
+;
+; ++index4;
+;
+	inc     _index4
+;
+; SPRITES[index4] = MetaSprite_X[index] + X_POS; // relative x + master x
+;
+	lda     #<(_SPRITES)
+	ldx     #>(_SPRITES)
+	clc
+	adc     _index4
+	bcc     L00D4
+	inx
+L00D4:	sta     ptr1
+	stx     ptr1+1
+	ldy     _index
+	lda     _MetaSprite_X,y
+	clc
+	adc     _X_POS
+	ldy     #$00
+	sta     (ptr1),y
+;
+; ++index4;
+;
+	inc     _index4
+;
+; for (index = 0; index < 4; ++index) {
+;
+	inc     _index
+	jmp     L0113
+
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ movement_logic (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_movement_logic: near
+
+.segment	"CODE"
+
+;
+; if ((joypad1 & RIGHT) != 0) {
+;
+	lda     _joypad1
+	and     #$01
+	beq     L0115
+;
+; state = Going_Right;
+;
+	lda     #$00
+	sta     _state
+;
+; ++X_POS;
+;
+	inc     _X_POS
+;
+; if ((joypad1 & LEFT) != 0) {
+;
+L0115:	lda     _joypad1
+	and     #$02
+	beq     L0116
+;
+; state = Going_Left;
+;
+	lda     #$02
+	sta     _state
+;
+; --X_POS;
+;
+	dec     _X_POS
+;
+; if ((joypad1 & DOWN) != 0) {
+;
+L0116:	lda     _joypad1
+	and     #$04
+	beq     L0117
+;
+; state = Going_Down;
+;
+	lda     #$01
+	sta     _state
+;
+; ++Y_POS;
+;
+	inc     _Y_POS
+;
+; if ((joypad1 & UP) != 0) {
+;
+L0117:	lda     _joypad1
+	and     #$08
+	beq     L0104
+;
+; state = Going_Up;
+;
+	lda     #$03
+	sta     _state
+;
+; --Y_POS;
+;
+	dec     _Y_POS
+;
+; }
+;
+L0104:	rts
 
 .endproc
 
@@ -279,6 +653,16 @@ L0065:	jmp     _reset_scroll
 ;
 	jsr     _screen_off
 ;
+; X_POS = 0x7f; // starting pos for sprite
+;
+	lda     #$7F
+	sta     _X_POS
+;
+; Y_POS = 0x77; 
+;
+	lda     #$77
+	sta     _Y_POS
+;
 ; load_palette();
 ;
 	jsr     _load_palette
@@ -289,32 +673,29 @@ L0065:	jmp     _reset_scroll
 ;
 ; while (NMI_flag == 0);
 ;
-L0074:	lda     _NMI_flag
-	beq     L0074
+L0118:	lda     _NMI_flag
+	beq     L0118
+;
+; Get_Input();
+;
+	jsr     _Get_Input
+;
+; movement_logic();
+;
+	jsr     _movement_logic
+;
+; update_sprites();
+;
+	jsr     _update_sprites
 ;
 ; NMI_flag = 0;
 ;
 	lda     #$00
 	sta     _NMI_flag
 ;
-; if (Frame_Count == 30) {
-;
-	lda     _Frame_Count
-	cmp     #$1E
-	bne     L0074
-;
-; load_text_increment();
-;
-	jsr     _load_text_increment
-;
-; Frame_Count = 0;
-;
-	lda     #$00
-	sta     _Frame_Count
-;
 ; while (1) {
 ;
-	jmp     L0074
+	jmp     L0118
 
 .endproc
 

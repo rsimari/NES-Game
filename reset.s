@@ -131,8 +131,32 @@ BlankName:		;blanks screen
 
 
 nmi:
+	pha
+	tya
+	pha
+	txa
+	pha
+	
 	inc _NMI_flag
 	inc _Frame_Count
+	lda #0
+	sta $2003
+	lda #2
+	sta $4014 ;push sprite data to OAM from $200-2ff
+	lda #$90
+	sta $2000 ;nmi on
+	lda #$1e
+	sta $2001 ;screen on
+	lda $2002 ;reset the latch
+	lda #0
+	sta $2005
+	sta $2005 ;double checking that the scroll position is reset
+	
+	pla
+	tax
+	pla
+	tay
+	pla
 irq:
     rti
 
@@ -149,4 +173,4 @@ irq:
 
 .segment "CHARS"
 
-	.incbin "Alpha.chr"
+	.incbin "1sprite.chr"

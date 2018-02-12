@@ -12,86 +12,126 @@
 #define PPU_ADDR    *((unsigned char*)0x2006) // where to write to
 #define PPU_DATA    *((unsigned char*)0x2007) // what to write
 
-unsigned char index;
+// NES controller definitions
+#define RIGHT		0x01
+#define LEFT		0x02
+#define DOWN		0x04
+#define UP			0x08
+#define START		0x10
+#define SELECT		0x20
+#define B_BUTTON	0x40
+#define A_BUTTON	0x80
+
+#pragma bss-name(push, "ZEROPAGE")
 unsigned char NMI_flag; // for when NMI interrupt is activate for writing during V-blank
 unsigned char Frame_Count; // counts number frames that have passed since start
+unsigned char index;
+unsigned char index4;
 unsigned char Text_Position; // position of next letter to write
+unsigned char X_POS; // x coord of sprite
+unsigned char Y_POS; // y coord of sprite
+unsigned char move;
+unsigned char move4;
+unsigned char move_count;
+unsigned char state;
+unsigned char state4;
+// used and set in asm4c.s
+unsigned char joypad1;
+unsigned char joypad1old;
+unsigned char joypad1test; 
+unsigned char joypad2; 
+unsigned char joypad2old;
+unsigned char joypad2test;
+
+#pragma bss-name(push, "OAM") // initializes segment OAM for compiler
+unsigned char SPRITES[256];
 
 const unsigned char TEXT[]={"Dont tell me I cant pbui"};
-const unsigned char PALETTE[]={ 0x1f, 0x00, 0x10, 0x20 }; //black, gray, lt gray, white
 
-void screen_off(void);
-void screen_on(void);
-void load_palette(void);
-void reset_scroll(void);
-void load_text_increment(void);
+const unsigned char PALETTE[] = { // loaded at 0x23c0 for color palettes
+	0x19, 0, 0, 0,  
+	0, 0, 0, 0,  
+	0, 0, 0, 0,  
+	0, 0, 0, 0,
+	0x19, 0x37, 0x24, 1,  
+	0, 0, 0, 0,  
+	0, 0, 0, 0,  
+	0, 0, 0, 0
+};
+
+const unsigned char ATTR_TABLE[] = { // directs each quadrant of screen to which pallete to use
+	/*
+		bits = 44332211
+		screen = 
+			1, 2
+			3, 4
+		refer to table at bottom @ https://nesdoug.com/2015/11/19/5-a-little-color/ for info
+		Note: this will grow to 0x23c0 - 0x23ff for entire screen
+	*/
+	0x44, // top left - 0100 0100
+	0xbb, // top right - 1011 1011
+	0x44, // bottom left - 0100 0100
+	0xbb // bottom right - 1011 1011
+};
+
+const unsigned char MetaSprite_Y[] = { 0, 0, 8, 8 }; // relative y coords
+const unsigned char MetaSprite_X[] = { 0, 8, 0, 8 }; // relative x coords
+const unsigned char MetaSprite_Attr[] = { 0, 0, 0, 0 }; // used for flipping and palette
+
+const unsigned char MetaSprite_Tile[] = { //tile numbers
+	2, 3, 0x12, 0x13, //right
+	0, 1, 0x10, 0x11, //down
+	6, 7, 0x16, 0x17, //left
+	4, 5, 0x14, 0x15  //up
+}; 
+// const unsigned char MetaSprite_Tile[] = {0, 1, 0x10, 0x11}; // tile numbers
+
+#define Going_Right 0
+#define Going_Down  1
+#define Going_Left  2
+#define Going_Up    3
+
+#include "screen_utils.c"
+
+void Get_Input(void); // refers to asm4c.s code which reads from the controller
+void movement_logic(void);
 
 void main (void) {
 	screen_off();
+	X_POS = 0x7f; // starting pos for sprite
+	Y_POS = 0x77; 
 	load_palette();
-
 	screen_on();
 
 	while (1) {
 		// wait for NMI interrupt
 		while (NMI_flag == 0);
+
+		Get_Input();
+		movement_logic();
+		update_sprites();
+
 		NMI_flag = 0;
-
-		if (Frame_Count == 30) {
-			load_text_increment();
-			Frame_Count = 0;
-		}
 	}
 }
 
-void screen_off(void) {
-	// turn off screen
-	PPU_CTRL = 0; // set all bits to 0
-	PPU_MASK = 0;
-}
-
-void screen_on(void) {
-	// turn on screen
-	PPU_CTRL = 0x90; // NMI on, bits = 1001 0000, this turns on NMI
-	PPU_MASK = 0x1e; // screen on, bits = 0001 1110, this turns on all graphics
-}
-
-void load_palette(void) {
-	// load a color palette
-	PPU_ADDR = 0x3f; // set write address in the PPU to 0x3f00
-	PPU_ADDR = 0x00;
-	// PPU_DATA increments automatically value set in 0x2000:2
-	for (index = 0; index < sizeof(PALETTE); ++index){
-		PPU_DATA = PALETTE[index]; // writes Palette data to 0x3f00, then increments
+void movement_logic(void) {
+	if ((joypad1 & RIGHT) != 0) {
+		state = Going_Right;
+		++X_POS;
 	}
-	// because we wrote to PPU_DATA
-	reset_scroll();
-}
-
-void reset_scroll(void) {
-	// resets scroll registers that get messed up after writing to PPU_DATA register
-	PPU_ADDR = 0;
-	PPU_ADDR = 0;
-	SCROLL = 0;
-	SCROLL = 0;
-}
-
-void load_text_increment(void) {
-	if (Text_Position < sizeof(TEXT)) {
-		PPU_ADDR = 0x21; // location address on the screen to write
-		PPU_ADDR = 0xc5 + Text_Position;
-		PPU_DATA = TEXT[Text_Position];
-		// always use ++x instead of x++, its faster
-		++Text_Position;
-	} else {
-		// if we have written all letters go to beginning
-		Text_Position = 0;
-		PPU_ADDR = 0x21;
-		PPU_ADDR = 0xc5;
-		// clear all PPU_DATA registers to they dont get drawn in next frame
-		for (index = 0; index < sizeof(TEXT); ++index) {
-			PPU_DATA = 0;
-		}
+	if ((joypad1 & LEFT) != 0) {
+		state = Going_Left;
+		--X_POS;
 	}
-	reset_scroll();
+	if ((joypad1 & DOWN) != 0) {
+		state = Going_Down;
+		++Y_POS;
+	}
+	if ((joypad1 & UP) != 0) {
+		state = Going_Up;
+		--Y_POS;
+	}
 }
+
+

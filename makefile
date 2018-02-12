@@ -4,12 +4,15 @@ LD65 = ld65
 NAME = main
 
 
-$(NAME).nes: $(NAME).o reset.o nes.cfg
-	$(LD65) -C nes.cfg -o $(NAME).nes reset.o $(NAME).o nes.lib
+$(NAME).nes: $(NAME).o reset.o asm4c.o nes.cfg
+	$(LD65) -C nes.cfg -o $(NAME).nes reset.o $(NAME).o asm4c.o nes.lib
 	rm *.o
 
 reset.o: reset.s
 	$(CA65) reset.s
+
+asm4c.o: asm4c.s
+	$(CA65) asm4c.s
 
 $(NAME).o: $(NAME).s
 	$(CA65) $(NAME).s
