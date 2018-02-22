@@ -31,7 +31,10 @@ APU_FRAME_CTR = $4017
 	.byte $01                ; defines size of CHR ROM x 8KiB
 	.byte $00                ; 0 for horizontal mirroring, 1 for vertical
 	.byte $00                ; which mapper to use
-	.res 8, 0                ; set the rest of the 8 bytes to 0, we dont need them
+	.byte $00                ; size of PRG RAM x 8Kib
+	.byte $00                ; NTSC
+	.byte $00                ; not used
+	.res 5, 0                ; set the rest of the 8 bytes to 0, we dont need them
 
 .segment "STARTUP"
 	; startup code from nes.cfg
@@ -58,18 +61,17 @@ start:
 	; it is false to start
 	bit PPU_STATUS
 
-vblank_wait_1:
+@vblank_wait_1:
 	; first of two vblank waits to ensure that the PPU has started and stabilized
 	bit PPU_STATUS
-	bpl vblank_wait_1 ; branch if plus
+	bpl @vblank_wait_1 ; branch if plus
 
 	stx APU_STATUS     ; sets APU_STATUS to 0 which disables music
 
 	txa                ; put the value from x into accumulator, which is $00
-
-clear_ram:
+@clear_ram:
 	; puts $00 in all RAM addresses
-    sta $0000, x
+    sta $00, x
     sta $0100, x
     sta $0300, x ; skip $0200 because thats where OAM data goes
     sta $0400, x ; $0200 should be initialized to $ef-$ff or else
@@ -79,25 +81,25 @@ clear_ram:
 
     inx ; increment x value
 
-    bne clear_ram ; will jump back to clear_ram if Z in process register is 0
+    bne @clear_ram ; will jump back to clear_ram if Z in process register is 0
                    ; Z is the result of the last operation, in this case it will
                    ; run $ff times
 
     lda #$ef       ; loads $ef into the accumulator
-clear_oam:
+@clear_oam:
 	sta $0200, x   ; stores the accumulator value at $0200 which is $ef
 				   ; indexed by x which is $00 from the last loop
 	inx            ; increment x
 	inx
 	inx
 	inx
-	bne clear_oam ; set every 4 bytes to $ef, these are the values for the sprites locations
+	bne @clear_oam ; set every 4 bytes to $ef, these are the values for the sprites locations
 
 
-vblank_wait_2:
+@vblank_wait_2:
 	; again make sure PPU has stabilized
 	bit PPU_STATUS
-	bpl vblank_wait_2
+	bpl @vblank_wait_2
 
 	; initialize PPU OAM
 	stx OAM_ADDRESS ; store $00 at OAM_ADDRESS
@@ -116,7 +118,6 @@ vblank_wait_2:
 
 ; code for what to do on interrupts
 nmi:
-
 irq:
 	rti ; return from interrupt
 
@@ -128,6 +129,6 @@ irq:
 	.word start ; $fffc reset
 	.word irq   ; $fffe irq
 
-.segment "CHAR"
+.segment "CHARS"
 ; include the CHR ROM data, like backgrounds, sprites
-	.incbin "Alpha.chr"
+	.incbin "sprites.chr"
