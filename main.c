@@ -20,12 +20,15 @@ const char TEXT [] = {
 	72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100 // Hello World
 };
 
-const char TIME [] = { 0x30, 0x3a, 0x30, 0x30 }; // 0:00
+uint8_t time_min = 0;     // 0 in the .chr file
+uint8_t time_sec_low = 0;
+uint8_t time_sec_high = 0;
 
 void reset_scroll(void);
 void screen_on(void);
 void update_time(void);
 void input_handler(void);
+void add_second(void);
 
 // main is called from reset.s 
 int main(void) {
@@ -34,14 +37,8 @@ int main(void) {
 	PPU_ADDRESS = BG_PALETTE_LOW;
 	for (i = 0; i < sizeof(PALETTE); ++i) // always use ++i, instead of i++
 		PPU_DATA = PALETTE[i];
-
-	// write text to nametable 0
-	// PPU_ADDRESS = NAMETABLE0_HIGH + 0x01; // offset to put in middle of screen
-	// PPU_ADDRESS = NAMETABLE0_LOW  + 0xca;
-	// for (i = 0; i < sizeof(TEXT); ++i)
-	// 	PPU_DATA = TEXT[i];
-	update_time();
 	reset_scroll();
+	update_time();
 
 	player.x = MIN_X + 20;
 	player.y = MIN_Y + 20;
@@ -52,8 +49,12 @@ int main(void) {
 	// main game loop
 	while(1) {
 		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
+		if (Frame_Number == 60) {
+			add_second();
+			Frame_Number = 0;
+		}
 		reset_scroll();
-
+		update_time();
 		input_handler();
 	}
 
@@ -77,8 +78,11 @@ void update_time(void) {
 	// updates time on screen
 	PPU_ADDRESS = NAMETABLE0_HIGH + 0x00; // top-right of screen
 	PPU_ADDRESS = NAMETABLE0_LOW  + 0x59;
-	for (i = 0; i < sizeof(TIME); ++i)
-		PPU_DATA = TIME[i];
+	PPU_DATA = NUMBER_0 + time_min;
+	PPU_DATA = 0x3a; // ':'
+	PPU_DATA = NUMBER_0 + time_sec_high;
+	PPU_DATA = NUMBER_0 + time_sec_low;
+	reset_scroll();
 }
 
 void input_handler(void) {
@@ -100,6 +104,26 @@ void input_handler(void) {
 	if (InputPort1 & BUTTON_RIGHT) {
 		if (player.x < MAX_Y + SPRITE_HEIGHT) {
 			++player.x;
+		}
+	}
+}
+
+void add_second(void) {
+	if (time_sec_low < 9)
+		++time_sec_low;
+	else if (time_sec_low == 9) {
+		time_sec_low = 0;
+		if (time_sec_high < 9)
+			++time_sec_high;
+		else if (time_sec_high == 9) {
+			time_sec_high = 0;
+			if (time_min < 9) 
+				++time_min;
+			else {
+				time_min = 0;
+				time_sec_high = 0;
+				time_sec_low = 0;
+			}
 		}
 	}
 }

@@ -8,7 +8,7 @@
 #include <stdint.h>
 
 extern uint8_t Frame_Number;
-#pragma zpsym("Frame_Number");
+#pragma zpsym("Frame_Number"); // tells compiler that its a zeropage symbol thats already defined
 
 extern uint8_t InputPort1;
 #pragma zpsym("InputPort1");

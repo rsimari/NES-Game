@@ -63,6 +63,7 @@
 // .chr mappings
 #define PLAYER_TILE   0x10
 #define SPRITE_HEIGHT 0x10
+#define NUMBER_0      0x30
 
 // button addres mappings
 #define BUTTON_RIGHT  0x01
