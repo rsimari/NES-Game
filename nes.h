@@ -29,13 +29,13 @@
 
 // sprite palettes
 #define SP_PALETTE0_HIGH 0x3f
-#define SP_PALETTE0_LOW  0x11
-#define SP_PALETTE1_HIGH 0x3f
-#define SP_PALETTE1_LOW  0x15
-#define SP_PALETTE2_HIGH 0x3f
-#define SP_PALETTE2_LOW  0x19
-#define SP_PALETTE3_HIGH 0x3f
-#define SP_PALETTE3_LOW  0x1d
+#define SP_PALETTE0_LOW  0x10
+// #define SP_PALETTE1_HIGH 0x3f
+// #define SP_PALETTE1_LOW  0x15
+// #define SP_PALETTE2_HIGH 0x3f
+// #define SP_PALETTE2_LOW  0x19
+// #define SP_PALETTE3_HIGH 0x3f
+// #define SP_PALETTE3_LOW  0x1d
 
 // address of start of nametable 0-3, $2000-$2c00
 #define NAMETABLE0_HIGH 0x20
@@ -46,6 +46,16 @@
 #define NAMETABLE2_LOW  0x00
 #define NAMETABLE3_HIGH 0x2c
 #define NAMETABLE3_LOW  0x00
+
+// addresses of attribute tables, 
+#define ATTRTABLE0_HIGH 0x23 // each byte represents a 32x32
+#define ATTRTABLE0_LOW  0xc0 // pixel part of screen from $23c0 - $23ff
+#define ATTRTABLE1_HIGH 0x27
+#define ATTRTABLE1_LOW  0xc0
+#define ATTRTABLE2_HIGH 0x2b
+#define ATTRTABLE2_LOW  0xc0
+#define ATTRTABLE3_HIGH 0x2f
+#define ATTRTABLE3_LOW  0xc0
 
 // helpful color definitions
 #define COLOR_BLACK 0x0f
@@ -61,9 +71,10 @@
 #define MAX_Y 239
 
 // .chr mappings
-#define PLAYER_TILE   0x10
-#define SPRITE_HEIGHT 0x10
-#define NUMBER_0      0x30
+#define PLAYER_TILE    0x10
+#define SPRITE_HEIGHT  0x10
+#define SPRITE_WIDTH   0x10
+#define NUMBER_0       0x30
 
 // button addres mappings
 #define BUTTON_RIGHT  0x01

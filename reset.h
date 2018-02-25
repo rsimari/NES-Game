@@ -29,16 +29,32 @@ void WaitFrame(void);
 size_t i;
 #pragma bss-name(pop)
 
+// see https://wiki.nesdev.com/w/index.php/PPU_OAM
 typedef struct sprite {
-	uint8_t y;
-	uint8_t tile_index;
-	uint8_t attributes;
-	uint8_t x;
+	uint8_t y; // y coord of sprite
+	uint8_t tile_index; // index of tile in .chr file
+	uint8_t attributes; // 7654 3210, 7: flip vert, 6: flip horiz
+	                    // 5: 0 in front of bg
+	                    // 4-2: nothing
+	                    // 1-0: palette number starting at $3f10
+	uint8_t x; // x coord of sprite
 } sprite_t;
+
+typedef struct meta_sprite {
+	uint8_t rel_x[4]; // relative x pos for sprites
+	uint8_t rel_y[4]; // relative y pos for sprites
+	uint8_t attr[4]; // attributes, used for flipping and other things
+	uint8_t tiles[4];
+	sprite_t sprites[4];
+} meta_sprite_t;
 
 // put sprite in OAM memory segment 
 #pragma bss-name(push, "OAM")
-sprite_t player;
+// uint8_t sprites[256] = {0}; // 256 bytes for sprite data
+sprite_t tl;
+sprite_t tr;
+sprite_t bl;
+sprite_t br;
 #pragma bss-name(pop)
 
 #endif
