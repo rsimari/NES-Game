@@ -41,20 +41,15 @@ typedef struct sprite {
 } sprite_t;
 
 typedef struct meta_sprite {
-	uint8_t rel_x[4]; // relative x pos for sprites
-	uint8_t rel_y[4]; // relative y pos for sprites
-	uint8_t attr[4]; // attributes, used for flipping and other things
-	uint8_t tiles[4];
 	sprite_t sprites[4];
 } meta_sprite_t;
 
 // put sprite in OAM memory segment 
 #pragma bss-name(push, "OAM")
-// uint8_t sprites[256] = {0}; // 256 bytes for sprite data
-sprite_t tl;
-sprite_t tr;
-sprite_t bl;
-sprite_t br;
+sprite_t player_tl;
+sprite_t player_tr;
+sprite_t player_bl;
+sprite_t player_br;
 #pragma bss-name(pop)
 
 #endif

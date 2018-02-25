@@ -12,22 +12,23 @@
 	.macpack	longbranch
 	.forceimport	__STARTUP__
 	.importzp	_Frame_Number
+	.importzp	_InputPort1
 	.import		_WaitFrame
 	.export		_i
-	.export		_tl
-	.export		_tr
-	.export		_bl
-	.export		_br
+	.export		_player_tl
+	.export		_player_tr
+	.export		_player_bl
+	.export		_player_br
 	.export		_PALETTE
-	.export		_SP_PALETTE
-	.export		_ATTRIBUTES
 	.export		_time_min
 	.export		_time_sec_low
 	.export		_time_sec_high
+	.export		_state
 	.export		_reset_scroll
 	.export		_screen_on
 	.export		_update_time
 	.export		_input_handler
+	.export		_update_sprite
 	.export		_add_second
 	.export		_draw_background
 	.export		_main
@@ -76,16 +77,6 @@ _PALETTE:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-_SP_PALETTE:
-	.byte	$21
-	.byte	$0C
-	.byte	$27
-	.byte	$37
-_ATTRIBUTES:
-	.byte	$44
-	.byte	$BB
-	.byte	$44
-	.byte	$BB
 
 .segment	"BSS"
 
@@ -97,17 +88,20 @@ _ATTRIBUTES:
 _i:
 	.res	2,$00
 .segment	"OAM"
-_tl:
+_player_tl:
 	.res	4,$00
 .segment	"OAM"
-_tr:
+_player_tr:
 	.res	4,$00
 .segment	"OAM"
-_bl:
+_player_bl:
 	.res	4,$00
 .segment	"OAM"
-_br:
+_player_br:
 	.res	4,$00
+.segment	"BSS"
+_state:
+	.res	1,$00
 
 ; ---------------------------------------------------------------
 ; void __near__ reset_scroll (void)
@@ -226,9 +220,202 @@ _br:
 .segment	"CODE"
 
 ;
+; if (InputPort1 & BUTTON_UP) {
+;
+	lda     _InputPort1
+	and     #$08
+	beq     L00FF
+;
+; if (player_tl.y > MIN_Y + SPRITE_HEIGHT && player_tr.y > MIN_Y + SPRITE_HEIGHT) {
+;
+	lda     _player_tl
+	cmp     #$11
+	bcc     L00FF
+	lda     _player_tr
+	cmp     #$11
+	bcc     L00FF
+;
+; --player_tr.y;
+;
+	dec     _player_tr
+;
+; --player_tl.y;
+;
+	dec     _player_tl
+;
+; --player_bl.y;
+;
+	dec     _player_bl
+;
+; --player_br.y;
+;
+	dec     _player_br
+;
+; state = Going_Up;
+;
+	lda     #$00
+	sta     _state
+;
+; if (InputPort1 & BUTTON_DOWN) {
+;
+L00FF:	lda     _InputPort1
+	and     #$04
+	beq     L0102
+;
+; if (player_bl.y < MAX_Y - SPRITE_HEIGHT && player_br.y < MAX_Y - SPRITE_HEIGHT) {
+;
+	lda     _player_bl
+	cmp     #$DF
+	bcs     L0102
+	lda     _player_br
+	cmp     #$DF
+	bcs     L0102
+;
+; ++player_tr.y;
+;
+	inc     _player_tr
+;
+; ++player_tl.y;
+;
+	inc     _player_tl
+;
+; ++player_bl.y;
+;
+	inc     _player_bl
+;
+; ++player_br.y;
+;
+	inc     _player_br
+;
+; state = Going_Down;
+;
+	lda     #$01
+	sta     _state
+;
+; if (InputPort1 & BUTTON_LEFT) {
+;
+L0102:	lda     _InputPort1
+	and     #$02
+	beq     L0106
+;
+; if (player_tl.x > MIN_X + SPRITE_WIDTH && player_bl.x > MIN_X + SPRITE_WIDTH) {
+;
+	lda     _player_tl+3
+	cmp     #$11
+	bcc     L0106
+	lda     _player_bl+3
+	cmp     #$11
+	bcc     L0106
+;
+; --player_tl.x;
+;
+	dec     _player_tl+3
+;
+; --player_tr.x;
+;
+	dec     _player_tr+3
+;
+; --player_bl.x;
+;
+	dec     _player_bl+3
+;
+; --player_br.x;
+;
+	dec     _player_br+3
+;
+; state = Going_Left;
+;
+	lda     #$02
+	sta     _state
+;
+; if (InputPort1 & BUTTON_RIGHT) {
+;
+L0106:	lda     _InputPort1
+	and     #$01
+	beq     L00C1
+;
+; ++player_tl.x;
+;
+	inc     _player_tl+3
+;
+; ++player_tr.x;
+;
+	inc     _player_tr+3
+;
+; ++player_bl.x;
+;
+	inc     _player_bl+3
+;
+; ++player_br.x;
+;
+	inc     _player_br+3
+;
+; state = Going_Right;
+;
+	lda     #$03
+	sta     _state
+;
 ; }
 ;
-	rts
+L00C1:	rts
+
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ update_sprite (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_update_sprite: near
+
+.segment	"CODE"
+
+;
+; if (state == Going_Up) {
+;
+	lda     _state
+;
+; } else if (state == Going_Down) {
+;
+	beq     L00D9
+	cmp     #$01
+;
+; } else if (state == Going_Left) {
+;
+	beq     L00D9
+	cmp     #$02
+	bne     L010B
+;
+; player_tr.tile_index = 0x81;
+;
+	lda     #$81
+	sta     _player_tr+1
+;
+; player_tl.tile_index = 0x80;
+;
+	lda     #$80
+;
+; } else if (state == Going_Right) {
+;
+	jmp     L010A
+L010B:	lda     _state
+	cmp     #$03
+	bne     L00D9
+;
+; player_tr.tile_index = 0x83;
+;
+	lda     #$83
+	sta     _player_tr+1
+;
+; player_tl.tile_index = 0x82;
+;
+	lda     #$82
+L010A:	sta     _player_tl+1
+;
+; }
+;
+L00D9:	rts
 
 .endproc
 
@@ -247,7 +434,7 @@ _br:
 ;
 	lda     _time_sec_low
 	cmp     #$09
-	bcs     L00C3
+	bcs     L010C
 ;
 ; ++time_sec_low;
 ;
@@ -256,9 +443,9 @@ _br:
 ; else if (time_sec_low == 9) {
 ;
 	rts
-L00C3:	lda     _time_sec_low
+L010C:	lda     _time_sec_low
 	cmp     #$09
-	bne     L00BA
+	bne     L00F3
 ;
 ; time_sec_low = 0;
 ;
@@ -269,7 +456,7 @@ L00C3:	lda     _time_sec_low
 ;
 	lda     _time_sec_high
 	cmp     #$05
-	bcs     L00C4
+	bcs     L010D
 ;
 ; ++time_sec_high;
 ;
@@ -278,9 +465,9 @@ L00C3:	lda     _time_sec_low
 ; else if (time_sec_high == 5) {
 ;
 	rts
-L00C4:	lda     _time_sec_high
+L010D:	lda     _time_sec_high
 	cmp     #$05
-	bne     L00BA
+	bne     L00F3
 ;
 ; time_sec_high = 0;
 ;
@@ -291,7 +478,7 @@ L00C4:	lda     _time_sec_high
 ;
 	lda     _time_min
 	cmp     #$09
-	bcs     L00C5
+	bcs     L010E
 ;
 ; ++time_min;
 ;
@@ -303,7 +490,7 @@ L00C4:	lda     _time_sec_high
 ;
 ; time_min = 0;
 ;
-L00C5:	lda     #$00
+L010E:	lda     #$00
 	sta     _time_min
 ;
 ; time_sec_high = 0;
@@ -316,7 +503,7 @@ L00C5:	lda     #$00
 ;
 ; }
 ;
-L00BA:	rts
+L00F3:	rts
 
 .endproc
 
@@ -362,12 +549,12 @@ L00BA:	rts
 ;
 	sta     _i
 	sta     _i+1
-L0041:	lda     _i+1
+L0035:	lda     _i+1
 	cmp     #$00
-	bne     L0049
+	bne     L003D
 	lda     _i
 	cmp     #$20
-L0049:	bcs     L0042
+L003D:	bcs     L0036
 ;
 ; PPU_DATA = PALETTE[i];
 ;
@@ -384,95 +571,95 @@ L0049:	bcs     L0042
 ; for (i = 0; i < sizeof(PALETTE); ++i) // always use ++i, instead of i++
 ;
 	inc     _i
-	bne     L0041
+	bne     L0035
 	inc     _i+1
-	jmp     L0041
+	jmp     L0035
 ;
 ; reset_scroll();
 ;
-L0042:	jsr     _reset_scroll
+L0036:	jsr     _reset_scroll
 ;
 ; update_time();
 ;
 	jsr     _update_time
 ;
-; tl.x = MIN_X + 20;
+; player_tl.x = MIN_X + 20;
 ;
 	lda     #$14
-	sta     _tl+3
+	sta     _player_tl+3
 ;
-; tl.y = MIN_Y + 20;
+; player_tl.y = MIN_Y + 20;
 ;
-	sta     _tl
+	sta     _player_tl
 ;
-; tl.attributes = 0x00;
+; player_tl.attributes = 0x00;
 ;
 	lda     #$00
-	sta     _tl+2
+	sta     _player_tl+2
 ;
-; tl.tile_index = 0x80;
+; player_tl.tile_index = 0x80;
 ;
 	lda     #$80
-	sta     _tl+1
+	sta     _player_tl+1
 ;
-; tr.x = MIN_X + 28;
+; player_tr.x = MIN_X + 28;
 ;
 	lda     #$1C
-	sta     _tr+3
+	sta     _player_tr+3
 ;
-; tr.y = MIN_Y + 20;
+; player_tr.y = MIN_Y + 20;
 ;
 	lda     #$14
-	sta     _tr
+	sta     _player_tr
 ;
-; tr.attributes = 0x00;
+; player_tr.attributes = 0x00;
 ;
 	lda     #$00
-	sta     _tr+2
+	sta     _player_tr+2
 ;
-; tr.tile_index = 0x81;
+; player_tr.tile_index = 0x81;
 ;
 	lda     #$81
-	sta     _tr+1
+	sta     _player_tr+1
 ;
-; bl.x = MIN_X + 20;
+; player_bl.x = MIN_X + 20;
 ;
 	lda     #$14
-	sta     _bl+3
+	sta     _player_bl+3
 ;
-; bl.y = MIN_Y + 28;
+; player_bl.y = MIN_Y + 28;
 ;
 	lda     #$1C
-	sta     _bl
+	sta     _player_bl
 ;
-; bl.attributes = 0x00;
+; player_bl.attributes = 0x00;
 ;
 	lda     #$00
-	sta     _bl+2
+	sta     _player_bl+2
 ;
-; bl.tile_index = 0x90;
+; player_bl.tile_index = 0x90;
 ;
 	lda     #$90
-	sta     _bl+1
+	sta     _player_bl+1
 ;
-; br.x = MIN_X + 28;
+; player_br.x = MIN_X + 28;
 ;
 	lda     #$1C
-	sta     _br+3
+	sta     _player_br+3
 ;
-; br.y = MIN_Y + 28;
+; player_br.y = MIN_Y + 28;
 ;
-	sta     _br
+	sta     _player_br
 ;
-; br.attributes = 0x00;
+; player_br.attributes = 0x00;
 ;
 	lda     #$00
-	sta     _br+2
+	sta     _player_br+2
 ;
-; br.tile_index = 0x91;
+; player_br.tile_index = 0x91;
 ;
 	lda     #$91
-	sta     _br+1
+	sta     _player_br+1
 ;
 ; screen_on();
 ;
@@ -480,13 +667,13 @@ L0042:	jsr     _reset_scroll
 ;
 ; WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
 ;
-L0073:	jsr     _WaitFrame
+L0067:	jsr     _WaitFrame
 ;
 ; if (Frame_Number == 60) { // this runs once every second
 ;
 	lda     _Frame_Number
 	cmp     #$3C
-	bne     L0078
+	bne     L006C
 ;
 ; add_second();
 ;
@@ -497,17 +684,21 @@ L0073:	jsr     _WaitFrame
 	lda     #$00
 	sta     _Frame_Number
 ;
-; reset_scroll();
-;
-L0078:	jsr     _reset_scroll
-;
 ; update_time();
 ;
-	jsr     _update_time
+L006C:	jsr     _update_time
+;
+; input_handler();
+;
+	jsr     _input_handler
+;
+; update_sprite();
+;
+	jsr     _update_sprite
 ;
 ; while(1) {
 ;
-	jmp     L0073
+	jmp     L0067
 
 .endproc
 

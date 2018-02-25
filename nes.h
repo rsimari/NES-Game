@@ -18,24 +18,10 @@
 // addresses of background palettes
 #define BG_PALETTE_HIGH  0x3f // universal background color
 #define BG_PALETTE_LOW   0x00
-#define BG_PALETTE0_HIGH 0x3f // background palette 0
-#define BG_PALETTE0_LOW  0x01
-#define BG_PALETTE1_HIGH 0x3f // background palette 1
-#define BG_PALETTE1_LOW  0x05
-#define BG_PALETTE2_HIGH 0x3f // background palette 2
-#define BG_PALETTE2_LOW  0x09
-#define BG_PALETTE3_HIGH 0x3f // background palette 3
-#define BG_PALETTE3_LOW  0x0d
 
-// sprite palettes
-#define SP_PALETTE0_HIGH 0x3f
-#define SP_PALETTE0_LOW  0x10
-// #define SP_PALETTE1_HIGH 0x3f
-// #define SP_PALETTE1_LOW  0x15
-// #define SP_PALETTE2_HIGH 0x3f
-// #define SP_PALETTE2_LOW  0x19
-// #define SP_PALETTE3_HIGH 0x3f
-// #define SP_PALETTE3_LOW  0x1d
+// sprite palette
+#define SP_PALETTE_HIGH 0x3f
+#define SP_PALETTE_LOW  0x10
 
 // address of start of nametable 0-3, $2000-$2c00
 #define NAMETABLE0_HIGH 0x20

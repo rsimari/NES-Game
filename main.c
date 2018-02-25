@@ -23,26 +23,19 @@ const uint8_t PALETTE[] = {
 	0,0,0,0
 };
 
-const uint8_t SP_PALETTE[] = {
-	0x21,
-	0x0c, 0x27, 0x37
-};
-
-const uint8_t ATTRIBUTES[] = {
-	0x44, // 0100 0100
-	0xbb, // 1011 1011
-	0x44, // 0100 0100
-	0xbb  // 1011 1011
-};
+enum {Going_Up, Going_Down, Going_Left, Going_Right};
 
 uint8_t time_min = 0;
 uint8_t time_sec_low = 0;
 uint8_t time_sec_high = 0;
 
+uint8_t state;
+
 void reset_scroll(void);
 void screen_on(void);
 void update_time(void);
 void input_handler(void);
+void update_sprite(void);
 void add_second(void);
 void draw_background(void);
 
@@ -54,40 +47,28 @@ int main(void) {
 	for (i = 0; i < sizeof(PALETTE); ++i) // always use ++i, instead of i++
 		PPU_DATA = PALETTE[i];
 	reset_scroll();
-
-	// PPU_ADDRESS = SP_PALETTE0_HIGH;
-	// PPU_ADDRESS = SP_PALETTE0_LOW;
-	// for (i = 0; i < sizeof(SP_PALETTE); ++i)
-	// 	PPU_DATA = SP_PALETTE[i];
-	// reset_scroll();
-
 	update_time();
 
-	// player.x = MIN_X + 20;
-	// player.y = MIN_Y + 20;
-	// player.tile_index = PLAYER_TILE;
-	// sprite_t tl;
-	tl.x = MIN_X + 20;
-	tl.y = MIN_Y + 20;
-	tl.attributes = 0x00;
-	tl.tile_index = 0x80;
+	// set initial location for 2x2 player sprite
+	player_tl.x = MIN_X + 20;
+	player_tl.y = MIN_Y + 20;
+	player_tl.attributes = 0x00;
+	player_tl.tile_index = 0x80;
 
-	tr.x = MIN_X + 28;
-	tr.y = MIN_Y + 20;
-	tr.attributes = 0x00;
-	tr.tile_index = 0x81;
+	player_tr.x = MIN_X + 28;
+	player_tr.y = MIN_Y + 20;
+	player_tr.attributes = 0x00;
+	player_tr.tile_index = 0x81;
 
-	bl.x = MIN_X + 20;
-	bl.y = MIN_Y + 28;
-	bl.attributes = 0x00;
-	bl.tile_index = 0x90;
+	player_bl.x = MIN_X + 20;
+	player_bl.y = MIN_Y + 28;
+	player_bl.attributes = 0x00;
+	player_bl.tile_index = 0x90;
 
-	br.x = MIN_X + 28;
-	br.y = MIN_Y + 28;
-	br.attributes = 0x00;
-	br.tile_index = 0x91;
-
-	// meta_sprite_t player;
+	player_br.x = MIN_X + 28;
+	player_br.y = MIN_Y + 28;
+	player_br.attributes = 0x00;
+	player_br.tile_index = 0x91;
 
 	screen_on();
 
@@ -98,9 +79,9 @@ int main(void) {
 			add_second();
 			Frame_Number = 0;
 		}
-		reset_scroll();
 		update_time();
-		// input_handler();
+		input_handler();
+		update_sprite();
 	}
 
 	return 0;
@@ -131,28 +112,62 @@ void update_time(void) {
 }
 
 void input_handler(void) {
-	/*
 	if (InputPort1 & BUTTON_UP) {
-		if (player.y > MIN_Y + SPRITE_HEIGHT) {
-			--player.y;
+		// check top 2 sprites
+		if (player_tl.y > MIN_Y + SPRITE_HEIGHT && player_tr.y > MIN_Y + SPRITE_HEIGHT) {
+			--player_tr.y;
+			--player_tl.y;
+			--player_bl.y;
+			--player_br.y;
+			state = Going_Up;
 		}
 	}
 	if (InputPort1 & BUTTON_DOWN) {
-		if (player.y < MAX_Y - SPRITE_HEIGHT) {
-			++player.y;
+		// check bottom 2 sprites
+		if (player_bl.y < MAX_Y - SPRITE_HEIGHT && player_br.y < MAX_Y - SPRITE_HEIGHT) {
+			++player_tr.y;
+			++player_tl.y;
+			++player_bl.y;
+			++player_br.y;
+			state = Going_Down;
 		}
 	}
 	if (InputPort1 & BUTTON_LEFT) {
-		if (player.x > MIN_X + SPRITE_WIDTH) {
-			--player.x;
+		// check left 2 sprites
+		if (player_tl.x > MIN_X + SPRITE_WIDTH && player_bl.x > MIN_X + SPRITE_WIDTH) {
+			--player_tl.x;
+			--player_tr.x;
+			--player_bl.x;
+			--player_br.x;
+			state = Going_Left;
 		}
 	}
 	if (InputPort1 & BUTTON_RIGHT) {
-		if (player.x < MAX_X + SPRITE_WIDTH) {
-			++player.x;
+		// check right 2 sprites
+		if (player_tr.x < MAX_X + SPRITE_WIDTH && player_br.x < MAX_X + SPRITE_WIDTH) {
+			++player_tl.x;
+			++player_tr.x;
+			++player_bl.x;
+			++player_br.x;
+			state = Going_Right;
 		}
 	}
-	*/
+}
+
+void update_sprite(void) {
+	if (state == Going_Up) {
+		// change sprite tile_index
+	} else if (state == Going_Down) {
+		// change sprite tile_index
+	} else if (state == Going_Left) {
+		// change sprite tile_index
+		player_tr.tile_index = 0x81;
+		player_tl.tile_index = 0x80;
+	} else if (state == Going_Right) {
+		// change sprite tile_index
+		player_tr.tile_index = 0x83;
+		player_tl.tile_index = 0x82;
+	}
 }
 
 void add_second(void) {
