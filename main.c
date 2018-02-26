@@ -16,7 +16,7 @@
 
 const uint8_t PALETTE[] = {
 	COLOR_WHITE, // background color first
-	COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, // background palette 0
+	0x0c, 0x27, 0x37, // background palette 0
 	0,0,0,0,
 	0,0,0,0,
 	0,0,0,0,

@@ -143,9 +143,9 @@ _level1:
 	.byte	$00
 _PALETTE:
 	.byte	$20
-	.byte	$0F
-	.byte	$0F
-	.byte	$0F
+	.byte	$0C
+	.byte	$27
+	.byte	$37
 	.byte	$00
 	.byte	$00
 	.byte	$00
