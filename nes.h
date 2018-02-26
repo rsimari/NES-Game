@@ -61,6 +61,7 @@
 #define SPRITE_HEIGHT  0x10
 #define SPRITE_WIDTH   0x10
 #define NUMBER_0       0x30
+#define BLOCK          0xa0
 
 // button addres mappings
 #define BUTTON_RIGHT  0x01

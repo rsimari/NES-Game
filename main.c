@@ -11,13 +11,16 @@
 #include "nes.h"
 #include "reset.h"
 
+// include level backgrounds
+#include "Levels/level1.h"
+
 const uint8_t PALETTE[] = {
 	COLOR_WHITE, // background color first
 	COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, // background palette 0
 	0,0,0,0,
 	0,0,0,0,
 	0,0,0,0,
-	0x21, 0x0c, 0x27, 0x37, // sprite palette 0
+	0x1c, 0x0c, 0x27, 0x37, // sprite palette 0
 	0,0,0,0,
 	0,0,0,0,
 	0,0,0,0
@@ -32,7 +35,10 @@ uint8_t time_sec_high = 0;
 uint8_t state;
 
 void reset_scroll(void);
+void set_palette(void);
+void init_player(void);
 void screen_on(void);
+void screen_off(void);
 void update_time(void);
 void input_handler(void);
 void update_sprite(void);
@@ -41,14 +47,45 @@ void draw_background(void);
 
 // main is called from reset.s 
 int main(void) {
+	screen_off();
+	draw_background();
+	set_palette();
+	update_time();
+	init_player();
+	screen_on();
+
+	// main game loop
+	while(1) {
+		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
+		if (Frame_Number == 60) { // this runs once every second
+			// add_second();
+			Frame_Number = 0;
+		}
+		update_time();
+		input_handler();
+		update_sprite();
+	}
+
+	return 0;
+}
+
+
+void reset_scroll(void) {
+	// sets scroll to 0,0 position, just like PPU_ADDRESS it increments after a write
+	PPU_SCROLL = 0x00;
+	PPU_SCROLL = 0x00;
+}
+
+void set_palette(void) {
 	// write palette data to BG_PALETTE
 	PPU_ADDRESS = BG_PALETTE_HIGH;
 	PPU_ADDRESS = BG_PALETTE_LOW;
 	for (i = 0; i < sizeof(PALETTE); ++i) // always use ++i, instead of i++
 		PPU_DATA = PALETTE[i];
 	reset_scroll();
-	update_time();
+}
 
+void init_player(void) {
 	// set initial location for 2x2 player sprite
 	player_tl.x = MIN_X + 20;
 	player_tl.y = MIN_Y + 20;
@@ -69,35 +106,18 @@ int main(void) {
 	player_br.y = MIN_Y + 28;
 	player_br.attributes = 0x00;
 	player_br.tile_index = 0x91;
-
-	screen_on();
-
-	// main game loop
-	while(1) {
-		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
-		if (Frame_Number == 60) { // this runs once every second
-			add_second();
-			Frame_Number = 0;
-		}
-		update_time();
-		input_handler();
-		update_sprite();
-	}
-
-	return 0;
-}
-
-
-void reset_scroll(void) {
-	// sets scroll to 0,0 position, just like PPU_ADDRESS it increments after a write
-	PPU_SCROLL = 0x00;
-	PPU_SCROLL = 0x00;
+	reset_scroll();
 }
 
 void screen_on(void) {
 	// enable NMI and rendering (see https://wiki.nesdev.com/w/index.php/PPU_registers#PPUCTRL)
 	PPU_CTRL = 0x80; // 1000 0000, turns NMI on
 	PPU_MASK = 0x1e; // 0001 1110, show sprites and background
+}
+
+void screen_off(void) {
+	PPU_CTRL = 0x00;
+	PPU_MASK = 0x00;
 }
 
 void update_time(void) {
@@ -157,16 +177,20 @@ void input_handler(void) {
 void update_sprite(void) {
 	if (state == Going_Up) {
 		// change sprite tile_index
+		player_tl.tile_index = 0x86;
+		player_tr.tile_index = 0x87;
 	} else if (state == Going_Down) {
 		// change sprite tile_index
+		player_tl.tile_index = 0x84;
+		player_tr.tile_index = 0x85;
 	} else if (state == Going_Left) {
 		// change sprite tile_index
-		player_tr.tile_index = 0x81;
 		player_tl.tile_index = 0x80;
+		player_tr.tile_index = 0x81;
 	} else if (state == Going_Right) {
 		// change sprite tile_index
-		player_tr.tile_index = 0x83;
 		player_tl.tile_index = 0x82;
+		player_tr.tile_index = 0x83;
 	}
 }
 
@@ -190,8 +214,10 @@ void add_second(void) {
 	}
 }
 
+	// this is real bad...
 void draw_background(void) {
-
-	reset_scroll();
+	PPU_ADDRESS = NAMETABLE0_HIGH;
+	PPU_ADDRESS = NAMETABLE0_LOW;
+	UnRLE(level1);
 }
 

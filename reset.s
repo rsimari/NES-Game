@@ -1,10 +1,11 @@
 ; startup code for cc65/ca65
 ; author: Robert Simari
 ; data: 2/22/18
+; all credit for uncompressing RLE files goes to @Shiru
 
 	.import _main
 	.export __STARTUP__:absolute=1
-	.export _WaitFrame
+	.export _WaitFrame, _UnRLE
 	.exportzp _Frame_Number, _InputPort1, _InputPort1Prev, _InputPort2, _InputPort2Prev  ; export zeropage variables
 
 	; variables created by linker (see nes.cfg)
@@ -38,6 +39,12 @@ _InputPort2Prev: .res 1
 
 temp1:           .res 1
 temp2:           .res 1
+
+RLE_LOW:         .res 1
+RLE_HIGH:        .res 1
+RLE_TAG:         .res 1
+RLE_BYTE:        .res 1
+
 
 .segment "HEADER"
 	; this is where we define the iNES header that was allocated in nes.cfg
@@ -189,6 +196,48 @@ ReadInput:
     bne @loop
 
     rts
+
+; code that uncompresses .rle background files
+; written by @Shiru and posted on nesdev boards in 2010
+; code was provided with NES Screen Tool application
+_UnRLE:
+	tay
+	stx <RLE_HIGH
+	lda #0
+	sta <RLE_LOW
+
+	lda (RLE_LOW),y
+	sta <RLE_TAG
+	iny
+	bne @1
+	inc <RLE_HIGH
+@1:
+	lda (RLE_LOW),y
+	iny
+	bne @11
+	inc <RLE_HIGH
+@11:
+	cmp <RLE_TAG
+	beq @2
+	sta $2007
+	sta <RLE_BYTE
+	bne @1
+@2:
+	lda (RLE_LOW),y
+	beq @4
+	iny
+	bne @21
+	inc <RLE_HIGH
+@21:
+	tax
+	lda <RLE_BYTE
+@3:
+	sta $2007
+	dex
+	bne @3
+	beq @1
+@4:
+	rts
 
 
 ; code for what to do on interrupts

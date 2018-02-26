@@ -22,7 +22,9 @@ extern uint8_t InputPort2;
 extern uint8_t InputPort2Prev;
 #pragma zpsym("InputPort2Prev");
 
+// functions exported from reset.s
 void WaitFrame(void);
+void __fastcall__ UnRLE(const unsigned char* data);
 
 // puts an iterator variable and others in the zeropage for fast access
 #pragma bss-name(push, "ZEROPAGE")
