@@ -57,11 +57,13 @@
 #define MAX_Y 239
 
 // .chr mappings
-#define PLAYER_TILE    0x10
-#define SPRITE_HEIGHT  0x10
-#define SPRITE_WIDTH   0x10
-#define NUMBER_0       0x30
-#define BLOCK          0xa0
+#define PLAYER_HEIGHT    0x10
+#define PLAYER_WIDTH     0x08
+#define NUMBER_0         0x30
+#define PLAYER_LEFT_GAP  0x03
+#define PLAYER_RIGHT_GAP 0x03
+#define PLAYER_TOP_GAP   0x00
+#define PLAYER_BOT_GAP   0x00
 
 // button addres mappings
 #define BUTTON_RIGHT  0x01
