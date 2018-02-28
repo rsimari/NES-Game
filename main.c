@@ -2,7 +2,7 @@
 
 	Main driver program for NES game
 	date: 2/22/18
-	TODO: collisions, draw background, make UI, better sprite, 32x16 sprite
+	TODO: collisions, make UI, better sprite, 32x16 sprite
 	      title screen
 */
 
@@ -13,6 +13,9 @@
 
 // include level backgrounds
 #include "Levels/level1.h"
+
+// include level collision maps
+#include "Levels/level1.csv"
 
 const uint8_t PALETTE[] = {
 	COLOR_WHITE, // background color first
@@ -32,7 +35,19 @@ uint8_t time_min = 0;
 uint8_t time_sec_low = 0;
 uint8_t time_sec_high = 0;
 
-uint8_t state;
+uint8_t X;
+uint8_t Y;
+
+uint8_t player_state;
+
+uint8_t player_left_side;
+uint8_t player_right_side;
+uint8_t player_bottom;
+uint8_t player_top;
+uint8_t player_center_x;
+uint8_t player_center_y;
+uint8_t collision_row;
+uint8_t collision_col;
 
 void reset_scroll(void);
 void set_palette(void);
@@ -44,6 +59,9 @@ void input_handler(void);
 void update_sprite(void);
 void add_second(void);
 void draw_background(void);
+void get_player_border(void);
+void collision_check_vert(void);
+void collision_check_horiz(void);
 
 // main is called from reset.s 
 int main(void) {
@@ -58,10 +76,10 @@ int main(void) {
 	while(1) {
 		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
 		if (Frame_Number == 60) { // this runs once every second
-			// add_second();
+			add_second();
+			update_time();
 			Frame_Number = 0;
 		}
-		update_time();
 		input_handler();
 		update_sprite();
 	}
@@ -87,23 +105,25 @@ void set_palette(void) {
 
 void init_player(void) {
 	// set initial location for 2x2 player sprite
-	player_tl.x = MIN_X + 20;
-	player_tl.y = MIN_Y + 20;
+	X = 50;
+	Y = 64;
+	player_tl.x = MIN_X + X;
+	player_tl.y = MIN_Y + Y;
 	player_tl.attributes = 0x00;
 	player_tl.tile_index = 0x80;
 
-	player_tr.x = MIN_X + 28;
-	player_tr.y = MIN_Y + 20;
+	player_tr.x = MIN_X + X + 8;
+	player_tr.y = MIN_Y + Y;
 	player_tr.attributes = 0x00;
 	player_tr.tile_index = 0x81;
 
-	player_bl.x = MIN_X + 20;
-	player_bl.y = MIN_Y + 28;
+	player_bl.x = MIN_X + X;
+	player_bl.y = MIN_Y + Y + 8;
 	player_bl.attributes = 0x00;
 	player_bl.tile_index = 0x90;
 
-	player_br.x = MIN_X + 28;
-	player_br.y = MIN_Y + 28;
+	player_br.x = MIN_X + X + 8;
+	player_br.y = MIN_Y + Y + 8;
 	player_br.attributes = 0x00;
 	player_br.tile_index = 0x91;
 	reset_scroll();
@@ -133,61 +153,54 @@ void update_time(void) {
 
 void input_handler(void) {
 	if (InputPort1 & BUTTON_UP) {
-		// check top 2 sprites
-		if (player_tl.y > MIN_Y + SPRITE_HEIGHT && player_tr.y > MIN_Y + SPRITE_HEIGHT) {
-			--player_tr.y;
-			--player_tl.y;
-			--player_bl.y;
-			--player_br.y;
-			state = Going_Up;
-		}
+		--player_tr.y;
+		--player_tl.y;
+		--player_bl.y;
+		--player_br.y;
+		player_state = Going_Up;
 	}
 	if (InputPort1 & BUTTON_DOWN) {
-		// check bottom 2 sprites
-		if (player_bl.y < MAX_Y - SPRITE_HEIGHT && player_br.y < MAX_Y - SPRITE_HEIGHT) {
-			++player_tr.y;
-			++player_tl.y;
-			++player_bl.y;
-			++player_br.y;
-			state = Going_Down;
-		}
+		++player_tr.y;
+		++player_tl.y;
+		++player_bl.y;
+		++player_br.y;
+		player_state = Going_Down;
 	}
+
+	collision_check_vert();
+
 	if (InputPort1 & BUTTON_LEFT) {
-		// check left 2 sprites
-		if (player_tl.x > MIN_X + SPRITE_WIDTH && player_bl.x > MIN_X + SPRITE_WIDTH) {
-			--player_tl.x;
-			--player_tr.x;
-			--player_bl.x;
-			--player_br.x;
-			state = Going_Left;
-		}
+		--player_tl.x;
+		--player_tr.x;
+		--player_bl.x;
+		--player_br.x;
+		player_state = Going_Left;
 	}
 	if (InputPort1 & BUTTON_RIGHT) {
-		// check right 2 sprites
-		if (player_tr.x < MAX_X + SPRITE_WIDTH && player_br.x < MAX_X + SPRITE_WIDTH) {
-			++player_tl.x;
-			++player_tr.x;
-			++player_bl.x;
-			++player_br.x;
-			state = Going_Right;
-		}
+		++player_tl.x;
+		++player_tr.x;
+		++player_bl.x;
+		++player_br.x;
+		player_state = Going_Right;
 	}
+
+	collision_check_horiz();
 }
 
 void update_sprite(void) {
-	if (state == Going_Up) {
+	if (player_state == Going_Up) {
 		// change sprite tile_index
 		player_tl.tile_index = 0x86;
 		player_tr.tile_index = 0x87;
-	} else if (state == Going_Down) {
+	} else if (player_state == Going_Down) {
 		// change sprite tile_index
 		player_tl.tile_index = 0x84;
 		player_tr.tile_index = 0x85;
-	} else if (state == Going_Left) {
+	} else if (player_state == Going_Left) {
 		// change sprite tile_index
 		player_tl.tile_index = 0x80;
 		player_tr.tile_index = 0x81;
-	} else if (state == Going_Right) {
+	} else if (player_state == Going_Right) {
 		// change sprite tile_index
 		player_tl.tile_index = 0x82;
 		player_tr.tile_index = 0x83;
@@ -214,10 +227,73 @@ void add_second(void) {
 	}
 }
 
-	// this is real bad...
 void draw_background(void) {
 	PPU_ADDRESS = NAMETABLE0_HIGH;
 	PPU_ADDRESS = NAMETABLE0_LOW;
 	UnRLE(level1);
+}
+
+void get_player_border(void) {
+	// need to check for overflow
+	player_left_side  = player_tl.x + PLAYER_LEFT_GAP;
+	player_right_side = player_tr.x + PLAYER_WIDTH - PLAYER_RIGHT_GAP;
+	player_top        = player_tl.y + PLAYER_TOP_GAP;
+	player_bottom     = player_br.y + PLAYER_HEIGHT - PLAYER_BOT_GAP;
+	player_center_x   = (player_left_side + player_right_side) >> 1;
+	player_center_y   = (player_top + player_bottom) >> 1;
+	// 53 >> 3 = 6
+	// 53 << 2 = 212
+}
+
+void collision_check_horiz(void) {
+	get_player_border();
+	if (InputPort1 & BUTTON_RIGHT) {
+		// check right side
+		collision_row = player_center_y >> 3;
+		collision_col = player_right_side >> 3;
+		if (c_map1[collision_row][collision_col] != 0) {
+			--player_tl.x;
+			--player_bl.x;
+			--player_tr.x;
+			--player_br.x;
+		}
+	}
+	if (InputPort1 & BUTTON_LEFT) {
+		// check left side
+		collision_row = player_center_y >> 3;
+		collision_col = player_left_side >> 3;
+		if (c_map1[collision_row][collision_col] != 0) {
+			++player_tl.x;
+			++player_bl.x;
+			++player_tr.x;
+			++player_br.x;
+		}
+	}
+}
+
+void collision_check_vert(void) {
+	get_player_border();
+	if (InputPort1 & BUTTON_UP) {
+		// check right side
+		collision_row = player_top >> 3;
+		collision_col = player_center_x >> 3;
+		if (c_map1[collision_row][collision_col] != 0) {
+			++player_tl.y;
+			++player_bl.y;
+			++player_tr.y;
+			++player_br.y;
+		}
+	}
+	if (InputPort1 & BUTTON_DOWN) {
+		// check left side
+		collision_row = player_bottom >> 3;
+		collision_col = player_center_x >> 3;
+		if (c_map1[collision_row][collision_col] != 0) {
+			--player_tl.y;
+			--player_bl.y;
+			--player_tr.y;
+			--player_br.y;
+		}
+	}
 }
 

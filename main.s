@@ -21,11 +21,22 @@
 	.export		_player_bl
 	.export		_player_br
 	.export		_level1
+	.export		_c_map1
 	.export		_PALETTE
 	.export		_time_min
 	.export		_time_sec_low
 	.export		_time_sec_high
-	.export		_state
+	.export		_X
+	.export		_Y
+	.export		_player_state
+	.export		_player_left_side
+	.export		_player_right_side
+	.export		_player_bottom
+	.export		_player_top
+	.export		_player_center_x
+	.export		_player_center_y
+	.export		_collision_row
+	.export		_collision_col
 	.export		_reset_scroll
 	.export		_set_palette
 	.export		_init_player
@@ -36,6 +47,9 @@
 	.export		_update_sprite
 	.export		_add_second
 	.export		_draw_background
+	.export		_get_player_border
+	.export		_collision_check_vert
+	.export		_collision_check_horiz
 	.export		_main
 
 .segment	"DATA"
@@ -141,6 +155,967 @@ _level1:
 	.byte	$00
 	.byte	$01
 	.byte	$00
+_c_map1:
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
 _PALETTE:
 	.byte	$20
 	.byte	$0C
@@ -197,7 +1172,37 @@ _player_bl:
 _player_br:
 	.res	4,$00
 .segment	"BSS"
-_state:
+_X:
+	.res	1,$00
+.segment	"BSS"
+_Y:
+	.res	1,$00
+.segment	"BSS"
+_player_state:
+	.res	1,$00
+.segment	"BSS"
+_player_left_side:
+	.res	1,$00
+.segment	"BSS"
+_player_right_side:
+	.res	1,$00
+.segment	"BSS"
+_player_bottom:
+	.res	1,$00
+.segment	"BSS"
+_player_top:
+	.res	1,$00
+.segment	"BSS"
+_player_center_x:
+	.res	1,$00
+.segment	"BSS"
+_player_center_y:
+	.res	1,$00
+.segment	"BSS"
+_collision_row:
+	.res	1,$00
+.segment	"BSS"
+_collision_col:
 	.res	1,$00
 
 ; ---------------------------------------------------------------
@@ -251,12 +1256,12 @@ _state:
 ;
 	sta     _i
 	sta     _i+1
-L00AC:	lda     _i+1
+L046F:	lda     _i+1
 	cmp     #$00
-	bne     L00B4
+	bne     L0477
 	lda     _i
 	cmp     #$20
-L00B4:	bcs     L00AD
+L0477:	bcs     L0470
 ;
 ; PPU_DATA = PALETTE[i];
 ;
@@ -273,13 +1278,13 @@ L00B4:	bcs     L00AD
 ; for (i = 0; i < sizeof(PALETTE); ++i) // always use ++i, instead of i++
 ;
 	inc     _i
-	bne     L00AC
+	bne     L046F
 	inc     _i+1
-	jmp     L00AC
+	jmp     L046F
 ;
 ; reset_scroll();
 ;
-L00AD:	jmp     _reset_scroll
+L0470:	jmp     _reset_scroll
 
 .endproc
 
@@ -294,13 +1299,24 @@ L00AD:	jmp     _reset_scroll
 .segment	"CODE"
 
 ;
-; player_tl.x = MIN_X + 20;
+; X = 50;
 ;
-	lda     #$14
+	lda     #$32
+	sta     _X
+;
+; Y = 64;
+;
+	lda     #$40
+	sta     _Y
+;
+; player_tl.x = MIN_X + X;
+;
+	lda     _X
 	sta     _player_tl+3
 ;
-; player_tl.y = MIN_Y + 20;
+; player_tl.y = MIN_Y + Y;
 ;
+	lda     _Y
 	sta     _player_tl
 ;
 ; player_tl.attributes = 0x00;
@@ -313,14 +1329,16 @@ L00AD:	jmp     _reset_scroll
 	lda     #$80
 	sta     _player_tl+1
 ;
-; player_tr.x = MIN_X + 28;
+; player_tr.x = MIN_X + X + 8;
 ;
-	lda     #$1C
+	lda     _X
+	clc
+	adc     #$08
 	sta     _player_tr+3
 ;
-; player_tr.y = MIN_Y + 20;
+; player_tr.y = MIN_Y + Y;
 ;
-	lda     #$14
+	lda     _Y
 	sta     _player_tr
 ;
 ; player_tr.attributes = 0x00;
@@ -333,14 +1351,16 @@ L00AD:	jmp     _reset_scroll
 	lda     #$81
 	sta     _player_tr+1
 ;
-; player_bl.x = MIN_X + 20;
+; player_bl.x = MIN_X + X;
 ;
-	lda     #$14
+	lda     _X
 	sta     _player_bl+3
 ;
-; player_bl.y = MIN_Y + 28;
+; player_bl.y = MIN_Y + Y + 8;
 ;
-	lda     #$1C
+	lda     _Y
+	clc
+	adc     #$08
 	sta     _player_bl
 ;
 ; player_bl.attributes = 0x00;
@@ -353,13 +1373,18 @@ L00AD:	jmp     _reset_scroll
 	lda     #$90
 	sta     _player_bl+1
 ;
-; player_br.x = MIN_X + 28;
+; player_br.x = MIN_X + X + 8;
 ;
-	lda     #$1C
+	lda     _X
+	clc
+	adc     #$08
 	sta     _player_br+3
 ;
-; player_br.y = MIN_Y + 28;
+; player_br.y = MIN_Y + Y + 8;
 ;
+	lda     _Y
+	clc
+	adc     #$08
 	sta     _player_br
 ;
 ; player_br.attributes = 0x00;
@@ -499,16 +1524,7 @@ L00AD:	jmp     _reset_scroll
 ;
 	lda     _InputPort1
 	and     #$08
-	beq     L0177
-;
-; if (player_tl.y > MIN_Y + SPRITE_HEIGHT && player_tr.y > MIN_Y + SPRITE_HEIGHT) {
-;
-	lda     _player_tl
-	cmp     #$11
-	bcc     L0177
-	lda     _player_tr
-	cmp     #$11
-	bcc     L0177
+	beq     L0580
 ;
 ; --player_tr.y;
 ;
@@ -526,25 +1542,16 @@ L00AD:	jmp     _reset_scroll
 ;
 	dec     _player_br
 ;
-; state = Going_Up;
+; player_state = Going_Up;
 ;
 	lda     #$00
-	sta     _state
+	sta     _player_state
 ;
 ; if (InputPort1 & BUTTON_DOWN) {
 ;
-L0177:	lda     _InputPort1
+L0580:	lda     _InputPort1
 	and     #$04
-	beq     L017A
-;
-; if (player_bl.y < MAX_Y - SPRITE_HEIGHT && player_br.y < MAX_Y - SPRITE_HEIGHT) {
-;
-	lda     _player_bl
-	cmp     #$DF
-	bcs     L017A
-	lda     _player_br
-	cmp     #$DF
-	bcs     L017A
+	beq     L04D7
 ;
 ; ++player_tr.y;
 ;
@@ -562,25 +1569,20 @@ L0177:	lda     _InputPort1
 ;
 	inc     _player_br
 ;
-; state = Going_Down;
+; player_state = Going_Down;
 ;
 	lda     #$01
-	sta     _state
+	sta     _player_state
+;
+; collision_check_vert();
+;
+L04D7:	jsr     _collision_check_vert
 ;
 ; if (InputPort1 & BUTTON_LEFT) {
 ;
-L017A:	lda     _InputPort1
+	lda     _InputPort1
 	and     #$02
-	beq     L017E
-;
-; if (player_tl.x > MIN_X + SPRITE_WIDTH && player_bl.x > MIN_X + SPRITE_WIDTH) {
-;
-	lda     _player_tl+3
-	cmp     #$11
-	bcc     L017E
-	lda     _player_bl+3
-	cmp     #$11
-	bcc     L017E
+	beq     L0581
 ;
 ; --player_tl.x;
 ;
@@ -598,16 +1600,16 @@ L017A:	lda     _InputPort1
 ;
 	dec     _player_br+3
 ;
-; state = Going_Left;
+; player_state = Going_Left;
 ;
 	lda     #$02
-	sta     _state
+	sta     _player_state
 ;
 ; if (InputPort1 & BUTTON_RIGHT) {
 ;
-L017E:	lda     _InputPort1
+L0581:	lda     _InputPort1
 	and     #$01
-	beq     L012A
+	beq     L04E8
 ;
 ; ++player_tl.x;
 ;
@@ -625,14 +1627,14 @@ L017E:	lda     _InputPort1
 ;
 	inc     _player_br+3
 ;
-; state = Going_Right;
+; player_state = Going_Right;
 ;
 	lda     #$03
-	sta     _state
+	sta     _player_state
 ;
-; }
+; collision_check_horiz();
 ;
-L012A:	rts
+L04E8:	jmp     _collision_check_horiz
 
 .endproc
 
@@ -647,10 +1649,10 @@ L012A:	rts
 .segment	"CODE"
 
 ;
-; if (state == Going_Up) {
+; if (player_state == Going_Up) {
 ;
-	lda     _state
-	bne     L0183
+	lda     _player_state
+	bne     L0583
 ;
 ; player_tl.tile_index = 0x86;
 ;
@@ -661,12 +1663,12 @@ L012A:	rts
 ;
 	lda     #$87
 ;
-; } else if (state == Going_Down) {
+; } else if (player_state == Going_Down) {
 ;
-	jmp     L0182
-L0183:	lda     _state
+	jmp     L0582
+L0583:	lda     _player_state
 	cmp     #$01
-	bne     L0184
+	bne     L0584
 ;
 ; player_tl.tile_index = 0x84;
 ;
@@ -677,12 +1679,12 @@ L0183:	lda     _state
 ;
 	lda     #$85
 ;
-; } else if (state == Going_Left) {
+; } else if (player_state == Going_Left) {
 ;
-	jmp     L0182
-L0184:	lda     _state
+	jmp     L0582
+L0584:	lda     _player_state
 	cmp     #$02
-	bne     L0185
+	bne     L0585
 ;
 ; player_tl.tile_index = 0x80;
 ;
@@ -693,12 +1695,12 @@ L0184:	lda     _state
 ;
 	lda     #$81
 ;
-; } else if (state == Going_Right) {
+; } else if (player_state == Going_Right) {
 ;
-	jmp     L0182
-L0185:	lda     _state
+	jmp     L0582
+L0585:	lda     _player_state
 	cmp     #$03
-	bne     L014A
+	bne     L0507
 ;
 ; player_tl.tile_index = 0x82;
 ;
@@ -708,11 +1710,11 @@ L0185:	lda     _state
 ; player_tr.tile_index = 0x83;
 ;
 	lda     #$83
-L0182:	sta     _player_tr+1
+L0582:	sta     _player_tr+1
 ;
 ; }
 ;
-L014A:	rts
+L0507:	rts
 
 .endproc
 
@@ -731,7 +1733,7 @@ L014A:	rts
 ;
 	lda     _time_sec_low
 	cmp     #$09
-	bcs     L0186
+	bcs     L0586
 ;
 ; ++time_sec_low;
 ;
@@ -740,9 +1742,9 @@ L014A:	rts
 ; else if (time_sec_low == 9) {
 ;
 	rts
-L0186:	lda     _time_sec_low
+L0586:	lda     _time_sec_low
 	cmp     #$09
-	bne     L0164
+	bne     L0521
 ;
 ; time_sec_low = 0;
 ;
@@ -753,7 +1755,7 @@ L0186:	lda     _time_sec_low
 ;
 	lda     _time_sec_high
 	cmp     #$05
-	bcs     L0187
+	bcs     L0587
 ;
 ; ++time_sec_high;
 ;
@@ -762,9 +1764,9 @@ L0186:	lda     _time_sec_low
 ; else if (time_sec_high == 5) {
 ;
 	rts
-L0187:	lda     _time_sec_high
+L0587:	lda     _time_sec_high
 	cmp     #$05
-	bne     L0164
+	bne     L0521
 ;
 ; time_sec_high = 0;
 ;
@@ -775,7 +1777,7 @@ L0187:	lda     _time_sec_high
 ;
 	lda     _time_min
 	cmp     #$09
-	bcs     L0188
+	bcs     L0588
 ;
 ; ++time_min;
 ;
@@ -787,7 +1789,7 @@ L0187:	lda     _time_sec_high
 ;
 ; time_min = 0;
 ;
-L0188:	lda     #$00
+L0588:	lda     #$00
 	sta     _time_min
 ;
 ; time_sec_high = 0;
@@ -800,7 +1802,7 @@ L0188:	lda     #$00
 ;
 ; }
 ;
-L0164:	rts
+L0521:	rts
 
 .endproc
 
@@ -830,6 +1832,339 @@ L0164:	rts
 	lda     #<(_level1)
 	ldx     #>(_level1)
 	jmp     _UnRLE
+
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ get_player_border (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_get_player_border: near
+
+.segment	"CODE"
+
+;
+; player_left_side  = player_tl.x + PLAYER_LEFT_GAP;
+;
+	lda     _player_tl+3
+	clc
+	adc     #$03
+	sta     _player_left_side
+;
+; player_right_side = player_tr.x + PLAYER_WIDTH - PLAYER_RIGHT_GAP;
+;
+	lda     _player_tr+3
+	clc
+	adc     #$08
+	sec
+	sbc     #$03
+	sta     _player_right_side
+;
+; player_top        = player_tl.y + PLAYER_TOP_GAP;
+;
+	lda     _player_tl
+	sta     _player_top
+;
+; player_bottom     = player_br.y + PLAYER_HEIGHT - PLAYER_BOT_GAP;
+;
+	lda     _player_br
+	clc
+	adc     #$10
+	sta     _player_bottom
+;
+; player_center_x   = (player_left_side + player_right_side) >> 1;
+;
+	ldx     #$00
+	lda     _player_left_side
+	clc
+	adc     _player_right_side
+	bcc     L0589
+	inx
+L0589:	jsr     shrax1
+	sta     _player_center_x
+;
+; player_center_y   = (player_top + player_bottom) >> 1;
+;
+	ldx     #$00
+	lda     _player_top
+	clc
+	adc     _player_bottom
+	bcc     L058A
+	inx
+L058A:	jsr     shrax1
+	sta     _player_center_y
+;
+; }
+;
+	rts
+
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ collision_check_vert (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_collision_check_vert: near
+
+.segment	"CODE"
+
+;
+; get_player_border();
+;
+	jsr     _get_player_border
+;
+; if (InputPort1 & BUTTON_UP) {
+;
+	lda     _InputPort1
+	and     #$08
+	beq     L058D
+;
+; collision_row = player_top >> 3;
+;
+	lda     _player_top
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     _collision_row
+;
+; collision_col = player_center_x >> 3;
+;
+	lda     _player_center_x
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     _collision_col
+;
+; if (c_map1[collision_row][collision_col] != 0) {
+;
+	ldx     #$00
+	lda     _collision_row
+	jsr     aslax4
+	stx     tmp1
+	asl     a
+	rol     tmp1
+	clc
+	adc     #<(_c_map1)
+	sta     ptr1
+	lda     tmp1
+	adc     #>(_c_map1)
+	sta     ptr1+1
+	ldy     _collision_col
+	lda     (ptr1),y
+	beq     L058D
+;
+; ++player_tl.y;
+;
+	inc     _player_tl
+;
+; ++player_bl.y;
+;
+	inc     _player_bl
+;
+; ++player_tr.y;
+;
+	inc     _player_tr
+;
+; ++player_br.y;
+;
+	inc     _player_br
+;
+; if (InputPort1 & BUTTON_DOWN) {
+;
+L058D:	lda     _InputPort1
+	and     #$04
+	beq     L0578
+;
+; collision_row = player_bottom >> 3;
+;
+	lda     _player_bottom
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     _collision_row
+;
+; collision_col = player_center_x >> 3;
+;
+	lda     _player_center_x
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     _collision_col
+;
+; if (c_map1[collision_row][collision_col] != 0) {
+;
+	ldx     #$00
+	lda     _collision_row
+	jsr     aslax4
+	stx     tmp1
+	asl     a
+	rol     tmp1
+	clc
+	adc     #<(_c_map1)
+	sta     ptr1
+	lda     tmp1
+	adc     #>(_c_map1)
+	sta     ptr1+1
+	ldy     _collision_col
+	lda     (ptr1),y
+	beq     L0578
+;
+; --player_tl.y;
+;
+	dec     _player_tl
+;
+; --player_bl.y;
+;
+	dec     _player_bl
+;
+; --player_tr.y;
+;
+	dec     _player_tr
+;
+; --player_br.y;
+;
+	dec     _player_br
+;
+; }
+;
+L0578:	rts
+
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ collision_check_horiz (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_collision_check_horiz: near
+
+.segment	"CODE"
+
+;
+; get_player_border();
+;
+	jsr     _get_player_border
+;
+; if (InputPort1 & BUTTON_RIGHT) {
+;
+	lda     _InputPort1
+	and     #$01
+	beq     L0590
+;
+; collision_row = player_center_y >> 3;
+;
+	lda     _player_center_y
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     _collision_row
+;
+; collision_col = player_right_side >> 3;
+;
+	lda     _player_right_side
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     _collision_col
+;
+; if (c_map1[collision_row][collision_col] != 0) {
+;
+	ldx     #$00
+	lda     _collision_row
+	jsr     aslax4
+	stx     tmp1
+	asl     a
+	rol     tmp1
+	clc
+	adc     #<(_c_map1)
+	sta     ptr1
+	lda     tmp1
+	adc     #>(_c_map1)
+	sta     ptr1+1
+	ldy     _collision_col
+	lda     (ptr1),y
+	beq     L0590
+;
+; --player_tl.x;
+;
+	dec     _player_tl+3
+;
+; --player_bl.x;
+;
+	dec     _player_bl+3
+;
+; --player_tr.x;
+;
+	dec     _player_tr+3
+;
+; --player_br.x;
+;
+	dec     _player_br+3
+;
+; if (InputPort1 & BUTTON_LEFT) {
+;
+L0590:	lda     _InputPort1
+	and     #$02
+	beq     L055A
+;
+; collision_row = player_center_y >> 3;
+;
+	lda     _player_center_y
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     _collision_row
+;
+; collision_col = player_left_side >> 3;
+;
+	lda     _player_left_side
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     _collision_col
+;
+; if (c_map1[collision_row][collision_col] != 0) {
+;
+	ldx     #$00
+	lda     _collision_row
+	jsr     aslax4
+	stx     tmp1
+	asl     a
+	rol     tmp1
+	clc
+	adc     #<(_c_map1)
+	sta     ptr1
+	lda     tmp1
+	adc     #>(_c_map1)
+	sta     ptr1+1
+	ldy     _collision_col
+	lda     (ptr1),y
+	beq     L055A
+;
+; ++player_tl.x;
+;
+	inc     _player_tl+3
+;
+; ++player_bl.x;
+;
+	inc     _player_bl+3
+;
+; ++player_tr.x;
+;
+	inc     _player_tr+3
+;
+; ++player_br.x;
+;
+	inc     _player_br+3
+;
+; }
+;
+L055A:	rts
 
 .endproc
 
@@ -870,26 +2205,30 @@ L0164:	rts
 ;
 ; WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
 ;
-L0091:	jsr     _WaitFrame
+L0453:	jsr     _WaitFrame
 ;
 ; if (Frame_Number == 60) { // this runs once every second
 ;
 	lda     _Frame_Number
 	cmp     #$3C
-	bne     L0096
+	bne     L0458
+;
+; add_second();
+;
+	jsr     _add_second
+;
+; update_time();
+;
+	jsr     _update_time
 ;
 ; Frame_Number = 0;
 ;
 	lda     #$00
 	sta     _Frame_Number
 ;
-; update_time();
-;
-L0096:	jsr     _update_time
-;
 ; input_handler();
 ;
-	jsr     _input_handler
+L0458:	jsr     _input_handler
 ;
 ; update_sprite();
 ;
@@ -897,7 +2236,7 @@ L0096:	jsr     _update_time
 ;
 ; while(1) {
 ;
-	jmp     L0091
+	jmp     L0453
 
 .endproc
 
