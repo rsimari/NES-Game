@@ -5,7 +5,7 @@
 
 	.import _main
 	.export __STARTUP__:absolute=1
-	.export _WaitFrame, _UnRLE
+	.export _WaitFrame, _UnRLE, _Wait_Vblank
 	.exportzp _Frame_Number, _InputPort1, _InputPort1Prev, _InputPort2, _InputPort2Prev  ; export zeropage variables
 
 	; variables created by linker (see nes.cfg)
@@ -149,6 +149,11 @@ _WaitFrame:
 	jsr GetInput    ; read from input
 	rts
 
+_Wait_Vblank:
+	lda PPU_STATUS
+	bpl _Wait_Vblank
+	rts
+
 ; updates values read from controller
 ; for more info see http://wiki.nesdev.com/w/index.php/Controller_Reading
 GetInput:
@@ -257,7 +262,6 @@ nmi:
     					 ; this saves us precious vblank cycles
 
 	inc _Frame_Number ; keeps count of how many frames have passed
-	
 	lda #0
 	sta _Frame_Done ; set frame done to 0 (see _WaitFrame)
 
