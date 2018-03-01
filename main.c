@@ -58,6 +58,13 @@ uint8_t blocked;
 uint8_t blocked_top;
 uint8_t blocked_bot;
 
+uint8_t start_x;    // coordinates of where to start on level
+uint8_t start_y;
+uint8_t end_x_min;  // corners of ending square the player will end on and go to next level
+uint8_t end_x_max;
+uint8_t end_y_min;
+uint8_t end_y_max;
+
 void reset_scroll(void);
 void set_palette(void);
 void init_player(void);
@@ -76,6 +83,12 @@ void passed_level(void);
 // main is called from reset.s 
 int main(void) {
 	level_status = 0;
+	start_y = 50;
+	start_x = 50;
+	end_x_min = 45;
+	end_x_max = 55;
+	end_y_min = 80;
+	end_y_max = 90;
 	screen_off();
 	draw_background();
 	set_palette();
@@ -86,12 +99,12 @@ int main(void) {
 	// main game loop
 	while(1) {
 		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
-		if (time_sec_high == 1 && level_status == 0) {
-			// passed_level();
-			// screen_off();
-			// draw_background();
-			// Wait_Vblank();
-			// screen_on();
+		if (player_tl.x <= end_x_max && player_tl.x >= end_x_min && player_tl.y <= end_y_max && player_tl.y >= end_y_min) {
+			passed_level();
+			screen_off();
+			draw_background();
+			Wait_Vblank();
+			screen_on();
 		}
 		if (Frame_Number == 60) { // this runs once every second
 			add_second();
@@ -123,8 +136,8 @@ void set_palette(void) {
 
 void init_player(void) {
 	// set initial location for 2x2 player sprite
-	X = 50;
-	Y = 50;
+	X = start_x;
+	Y = start_y;
 	player_tl.x = MIN_X + X;
 	player_tl.y = MIN_Y + Y;
 	player_tl.attributes = 0x00;
