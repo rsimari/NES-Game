@@ -55,6 +55,8 @@ uint8_t player_center_y;
 uint8_t collision_row;
 uint8_t collision_col;
 uint8_t blocked;
+uint8_t blocked_top;
+uint8_t blocked_bot;
 
 void reset_scroll(void);
 void set_palette(void);
@@ -85,11 +87,11 @@ int main(void) {
 	while(1) {
 		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
 		if (time_sec_high == 1 && level_status == 0) {
-			passed_level();
-			screen_off();
-			draw_background();
-			Wait_Vblank();
-			screen_on();
+			// passed_level();
+			// screen_off();
+			// draw_background();
+			// Wait_Vblank();
+			// screen_on();
 		}
 		if (Frame_Number == 60) { // this runs once every second
 			add_second();
@@ -267,32 +269,50 @@ void get_player_border(void) {
 
 void collision_check_horiz(void) {
 	get_player_border();
+	blocked = 0;
+	blocked_top = 0;
+	blocked_bot = 0;
 	if (InputPort1 & BUTTON_RIGHT) {
 		// check right side
 		collision_row = player_center_y >> 3;
 		collision_col = player_right_side >> 3;
 		if (level_status == 0) {
-			blocked = c_map1[collision_row][collision_col];
+			blocked = c_map1[collision_row][collision_col];// | c_map1[collision_row-1][collision_col];
+			blocked_top = c_map1[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map1[++collision_row][collision_col];
 		} else if (level_status == 1) {
-			blocked = c_map2[collision_row][collision_col];
+			blocked = c_map2[collision_row][collision_col];// | c_map2[collision_row-1][collision_col];
+			blocked_top = c_map2[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map2[++collision_row][collision_col];
 		}
-		if (blocked == 1) {
+		if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 				--player_tl.x;
 				--player_bl.x;
 				--player_tr.x;
 				--player_br.x;
 		}
 	}
+	blocked = 0;
+	blocked_top = 0;
+	blocked_bot = 0;
 	if (InputPort1 & BUTTON_LEFT) {
 		// check left side
 		collision_row = player_center_y >> 3;
 		collision_col = player_left_side >> 3;
 		if (level_status == 0) {
-			blocked = c_map1[collision_row][collision_col];
+			blocked = c_map1[collision_row][collision_col];// | c_map1[collision_row-1][collision_col];
+			blocked_top = c_map1[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map1[++collision_row][collision_col];
 		} else if (level_status == 1) {
-			blocked = c_map2[collision_row][collision_col];
-		}
-		if (blocked == 1) {
+			blocked = c_map2[collision_row][collision_col];// | c_map2[collision_row-1][collision_col];
+			blocked_top = c_map2[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map2[++collision_row][collision_col];
+		} 
+		if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 			++player_tl.x;
 			++player_bl.x;
 			++player_tr.x;
@@ -303,17 +323,16 @@ void collision_check_horiz(void) {
 
 void collision_check_vert(void) {
 	get_player_border();
-
 	if (InputPort1 & BUTTON_UP) {
 		// check right side
 		collision_row = player_top >> 3;
 		collision_col = player_center_x >> 3;
 		if (level_status == 0) {
-			blocked = c_map1[collision_row][collision_col];
+			blocked = c_map1[collision_row][collision_col];// | c_map1[collision_row-1][collision_col];
 		} else if (level_status == 1) {
-			blocked = c_map2[collision_row][collision_col];
+			blocked = c_map2[collision_row][collision_col];// | c_map2[collision_row-1][collision_col];
 		}
-		if (blocked == 1) {
+		if (blocked != 0) {
 			++player_tl.y;
 			++player_bl.y;
 			++player_tr.y;
@@ -325,11 +344,11 @@ void collision_check_vert(void) {
 		collision_row = player_bottom >> 3;
 		collision_col = player_center_x >> 3;
 		if (level_status == 0) {
-			blocked = c_map1[collision_row][collision_col];
+			blocked = c_map1[collision_row][collision_col];// | c_map1[collision_row-1][collision_col];
 		} else if (level_status == 1) {
-			blocked = c_map2[collision_row][collision_col];
+			blocked = c_map2[collision_row][collision_col];// | c_map2[collision_row-1][collision_col];
 		}
-		if (blocked == 1) {
+		if (blocked != 0) {
 			--player_tl.y;
 			--player_bl.y;
 			--player_tr.y;
