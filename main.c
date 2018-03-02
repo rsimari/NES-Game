@@ -2,7 +2,7 @@
 
 	Main driver program for NES game
 	date: 2/22/18
-	TODO: collisions, make UI, better sprite, 32x16 sprite
+	TODO: make UI, better sprite, 32x16 sprite
 	      title screen
 */
 
@@ -13,9 +13,13 @@
 
 // include level backgrounds
 #include "Levels/level1.h"
+#include "Levels/level2.h"
+
+const unsigned char * const LEVELS[] = {level1, level2};
 
 // include level collision maps
 #include "Levels/level1.csv"
+#include "Levels/level2.csv"
 
 const uint8_t PALETTE[] = {
 	COLOR_WHITE, // background color first
@@ -30,15 +34,17 @@ const uint8_t PALETTE[] = {
 };
 
 enum {Going_Up, Going_Down, Going_Left, Going_Right};
+enum {Title_Mode, Play_Mode, End_Mode};
 
 uint8_t time_min = 0;
 uint8_t time_sec_low = 0;
 uint8_t time_sec_high = 0;
 
-uint8_t X;
-uint8_t Y;
+uint8_t X = 80;
+uint8_t Y = 80;
 
 uint8_t player_state;
+uint8_t level_status = 1;
 
 uint8_t player_left_side;
 uint8_t player_right_side;
@@ -48,6 +54,16 @@ uint8_t player_center_x;
 uint8_t player_center_y;
 uint8_t collision_row;
 uint8_t collision_col;
+uint8_t blocked;
+uint8_t blocked_top;
+uint8_t blocked_bot;
+
+uint8_t start_x;    // coordinates of where to start on level
+uint8_t start_y;
+uint8_t end_x_min;  // corners of ending square the player will end on and go to next level
+uint8_t end_x_max;
+uint8_t end_y_min;
+uint8_t end_y_max;
 
 void reset_scroll(void);
 void set_palette(void);
@@ -62,9 +78,17 @@ void draw_background(void);
 void get_player_border(void);
 void collision_check_vert(void);
 void collision_check_horiz(void);
+void passed_level(void);
 
 // main is called from reset.s 
 int main(void) {
+	level_status = 0;
+	start_y = 50;
+	start_x = 50;
+	end_x_min = 45;
+	end_x_max = 55;
+	end_y_min = 80;
+	end_y_max = 90;
 	screen_off();
 	draw_background();
 	set_palette();
@@ -75,6 +99,13 @@ int main(void) {
 	// main game loop
 	while(1) {
 		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
+		if (player_tl.x <= end_x_max && player_tl.x >= end_x_min && player_tl.y <= end_y_max && player_tl.y >= end_y_min) {
+			passed_level();
+			screen_off();
+			draw_background();
+			Wait_Vblank();
+			screen_on();
+		}
 		if (Frame_Number == 60) { // this runs once every second
 			add_second();
 			update_time();
@@ -105,8 +136,8 @@ void set_palette(void) {
 
 void init_player(void) {
 	// set initial location for 2x2 player sprite
-	X = 50;
-	Y = 64;
+	X = start_x;
+	Y = start_y;
 	player_tl.x = MIN_X + X;
 	player_tl.y = MIN_Y + Y;
 	player_tl.attributes = 0x00;
@@ -230,7 +261,13 @@ void add_second(void) {
 void draw_background(void) {
 	PPU_ADDRESS = NAMETABLE0_HIGH;
 	PPU_ADDRESS = NAMETABLE0_LOW;
-	UnRLE(level1);
+
+	if (level_status == 0) {
+		UnRLE(level1);
+	} else if (level_status == 1) {
+		UnRLE(level2);
+	}
+	reset_scroll();
 }
 
 void get_player_border(void) {
@@ -241,28 +278,54 @@ void get_player_border(void) {
 	player_bottom     = player_br.y + PLAYER_HEIGHT - PLAYER_BOT_GAP;
 	player_center_x   = (player_left_side + player_right_side) >> 1;
 	player_center_y   = (player_top + player_bottom) >> 1;
-	// 53 >> 3 = 6
-	// 53 << 2 = 212
 }
 
 void collision_check_horiz(void) {
 	get_player_border();
+	blocked = 0;
+	blocked_top = 0;
+	blocked_bot = 0;
 	if (InputPort1 & BUTTON_RIGHT) {
 		// check right side
 		collision_row = player_center_y >> 3;
 		collision_col = player_right_side >> 3;
-		if (c_map1[collision_row][collision_col] != 0) {
-			--player_tl.x;
-			--player_bl.x;
-			--player_tr.x;
-			--player_br.x;
+		if (level_status == 0) {
+			blocked = c_map1[collision_row][collision_col];// | c_map1[collision_row-1][collision_col];
+			blocked_top = c_map1[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map1[++collision_row][collision_col];
+		} else if (level_status == 1) {
+			blocked = c_map2[collision_row][collision_col];// | c_map2[collision_row-1][collision_col];
+			blocked_top = c_map2[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map2[++collision_row][collision_col];
+		}
+		if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
+				--player_tl.x;
+				--player_bl.x;
+				--player_tr.x;
+				--player_br.x;
 		}
 	}
+	blocked = 0;
+	blocked_top = 0;
+	blocked_bot = 0;
 	if (InputPort1 & BUTTON_LEFT) {
 		// check left side
 		collision_row = player_center_y >> 3;
 		collision_col = player_left_side >> 3;
-		if (c_map1[collision_row][collision_col] != 0) {
+		if (level_status == 0) {
+			blocked = c_map1[collision_row][collision_col];// | c_map1[collision_row-1][collision_col];
+			blocked_top = c_map1[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map1[++collision_row][collision_col];
+		} else if (level_status == 1) {
+			blocked = c_map2[collision_row][collision_col];// | c_map2[collision_row-1][collision_col];
+			blocked_top = c_map2[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map2[++collision_row][collision_col];
+		} 
+		if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 			++player_tl.x;
 			++player_bl.x;
 			++player_tr.x;
@@ -277,23 +340,37 @@ void collision_check_vert(void) {
 		// check right side
 		collision_row = player_top >> 3;
 		collision_col = player_center_x >> 3;
-		if (c_map1[collision_row][collision_col] != 0) {
+		if (level_status == 0) {
+			blocked = c_map1[collision_row][collision_col];// | c_map1[collision_row-1][collision_col];
+		} else if (level_status == 1) {
+			blocked = c_map2[collision_row][collision_col];// | c_map2[collision_row-1][collision_col];
+		}
+		if (blocked != 0) {
 			++player_tl.y;
 			++player_bl.y;
 			++player_tr.y;
-			++player_br.y;
+			++player_br.y;			
 		}
 	}
 	if (InputPort1 & BUTTON_DOWN) {
 		// check left side
 		collision_row = player_bottom >> 3;
 		collision_col = player_center_x >> 3;
-		if (c_map1[collision_row][collision_col] != 0) {
+		if (level_status == 0) {
+			blocked = c_map1[collision_row][collision_col];// | c_map1[collision_row-1][collision_col];
+		} else if (level_status == 1) {
+			blocked = c_map2[collision_row][collision_col];// | c_map2[collision_row-1][collision_col];
+		}
+		if (blocked != 0) {
 			--player_tl.y;
 			--player_bl.y;
 			--player_tr.y;
-			--player_br.y;
+			--player_br.y;			
 		}
 	}
+}
+
+void passed_level(void) {
+	++level_status;
 }
 

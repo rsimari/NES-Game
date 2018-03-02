@@ -25,6 +25,7 @@ extern uint8_t InputPort2Prev;
 // functions exported from reset.s
 void WaitFrame(void);
 void __fastcall__ UnRLE(const unsigned char* data);
+void Wait_Vblank(void);
 
 // puts an iterator variable and others in the zeropage for fast access
 #pragma bss-name(push, "ZEROPAGE")
