@@ -14,11 +14,13 @@
 // include level backgrounds
 #include "Levels/empty.h"
 #include "Levels/level1.h"
+#include "Levels/levelT.h"
 #include "Levels/level2.h"
 
-const unsigned char * const LEVELS[] = {level1, level2};
+const unsigned char * const LEVELS[] = {level1, level2, level3};
 
 // include level collision maps
+#include "Levels/levelT.csv"
 #include "Levels/level1.csv"
 #include "Levels/level2.csv"
 
@@ -86,7 +88,7 @@ void level_intro(void);
 void draw_title(void);
 void clear_nametable(void);
 
-// main is called from reset.s 
+// main is called from reset.s
 int main(void) {
 	level_status = 0;
 	game_state = Level_Intro;
@@ -295,7 +297,7 @@ void add_second(void) {
 			++time_sec_high;
 		else if (time_sec_high == 5) {
 			time_sec_high = 0;
-			if (time_min < 9) 
+			if (time_min < 9)
 				++time_min;
 			else {
 				time_min = 0;
@@ -311,8 +313,8 @@ void draw_background(void) {
 	PPU_ADDRESS = NAMETABLE0_LOW;
 
 	if (level_status == 0) {
-		UnRLE(level1);
-	} else if (level_status == 1) {
+		UnRLE(levelT);
+	} else if (level_status == 2) {
 		UnRLE(level2);
 	}
 	reset_scroll();
@@ -347,6 +349,11 @@ void collision_check_horiz(void) {
 			blocked_top = c_map2[--collision_row][collision_col];
 			++collision_row;
 			blocked_bot = c_map2[++collision_row][collision_col];
+		} else if (level_status == 2) {
+			blocked = c_map3[collision_row][collision_col];
+			blocked_top = c_map3[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map3[++collision_row][collision_col];
 		}
 		if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 				--player_tl.x;
@@ -372,7 +379,12 @@ void collision_check_horiz(void) {
 			blocked_top = c_map2[--collision_row][collision_col];
 			++collision_row;
 			blocked_bot = c_map2[++collision_row][collision_col];
-		} 
+		} else if (level_status == 2) {
+			blocked = c_map3[collision_row][collision_col];
+			blocked_top = c_map3[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map3[++collision_row][collision_col];
+		}
 		if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 			++player_tl.x;
 			++player_bl.x;
@@ -392,12 +404,14 @@ void collision_check_vert(void) {
 			blocked = c_map1[collision_row][collision_col];
 		} else if (level_status == 1) {
 			blocked = c_map2[collision_row][collision_col];
+		} else if (level_status == 2) {
+			blocked = c_map3[collision_row][collision_col];
 		}
 		if (blocked != 0) {
 			++player_tl.y;
 			++player_bl.y;
 			++player_tr.y;
-			++player_br.y;			
+			++player_br.y;
 		}
 	}
 	if (InputPort1 & BUTTON_DOWN) {
@@ -408,12 +422,14 @@ void collision_check_vert(void) {
 			blocked = c_map1[collision_row][collision_col];
 		} else if (level_status == 1) {
 			blocked = c_map2[collision_row][collision_col];
+		} else if (level_status == 2) {
+			blocked = c_map3[collision_row][collision_col];
 		}
 		if (blocked != 0) {
 			--player_tl.y;
 			--player_bl.y;
 			--player_tr.y;
-			--player_br.y;			
+			--player_br.y;
 		}
 	}
 }
