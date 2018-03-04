@@ -132,7 +132,8 @@ int main(void) {
 		if (game_state == Level) {
 			input_handler();
 			update_sprite();
-			if (player_tl.x <= end_x_max && player_tl.x >= end_x_min && player_tl.y <= end_y_max && player_tl.y >= end_y_min) {
+			if (player_tl.x <= end_x_max && player_tl.x + PLAYER_WIDTH >= end_x_min && 
+				player_tl.y <= end_y_max && player_tl.y + PLAYER_HEIGHT >= end_y_min) {
 				passed_level();
 				// set new end_x ... and player position for next level
 				if (level_status == 1) {
