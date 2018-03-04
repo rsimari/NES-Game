@@ -2,8 +2,6 @@
 
 	Main driver program for NES game
 	date: 2/22/18
-	TODO: make UI, better sprite, 32x16 sprite
-	      title screen
 */
 
 #include <stdint.h>
@@ -14,8 +12,8 @@
 // include level backgrounds
 #include "Levels/empty.h"
 #include "Levels/level1.h"
-#include "Levels/levelT.h"
 #include "Levels/level2.h"
+#include "Levels/levelT.h"
 
 const unsigned char * const LEVELS[] = {level1, level2, level3};
 
@@ -87,6 +85,7 @@ void passed_level(void);
 void level_intro(void);
 void draw_title(void);
 void clear_nametable(void);
+void draw_end(void);
 
 // main is called from reset.s
 int main(void) {
@@ -144,9 +143,19 @@ int main(void) {
 					end_y_min = 96;
 					end_y_max = 120;
 				} else if (level_status == 2) {
-
+					start_x = 112;
+					start_y = 104;
+					end_x_min = 144;
+					end_x_max = 160;
+					end_y_min = 96;
+					end_y_max = 120;
 				} else if (level_status == 3) {
-
+					start_x = 112;
+					start_y = 104;
+					end_x_min = 144;
+					end_x_max = 160;
+					end_y_min = 96;
+					end_y_max = 120;
 				}
 				// draw the next level intro
 				game_state = Level_Intro;
@@ -313,9 +322,11 @@ void draw_background(void) {
 	PPU_ADDRESS = NAMETABLE0_LOW;
 
 	if (level_status == 0) {
-		UnRLE(levelT);
-	} else if (level_status == 2) {
+		UnRLE(level1);
+	} else if (level_status == 1) {
 		UnRLE(level2);
+	} else if (level_status == 2) {
+		UnRLE(level3);
 	}
 	reset_scroll();
 }
@@ -459,6 +470,10 @@ void clear_nametable(void) {
 }
 
 void draw_title(void) {
+
+}
+
+void draw_end(void) {
 
 }
 
