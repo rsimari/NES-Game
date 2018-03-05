@@ -90,7 +90,7 @@ void draw_end(void);
 // main is called from reset.s
 int main(void) {
 	level_status = 0;
-	game_state = Level_Intro;
+	game_state = Title; // was Level_Intro;
 	start_x = 112;
 	start_y = 104;
 	end_x_min = 144;
@@ -98,7 +98,7 @@ int main(void) {
 	end_y_min = 96;
 	end_y_max = 120;
 	screen_off();
-	// draw_title();
+	draw_title();
 	level_intro();
 	set_palette();
 	screen_on();
@@ -107,6 +107,20 @@ int main(void) {
 	while(1) {
 		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
 
+		if (game_state == Title) {
+		  draw_title();
+		    if (InputPort1 & BUTTON_START) {
+		      timer = 0;
+		      game_state = Level_Intro;
+		      screen_off();
+		      clear_nametable();
+		      Wait_Vblank();
+		      screen_on();
+		      level_intro();
+		    }
+		    Frame_Number = 0;
+		}		
+		// title done... now start levels
 		if (game_state == Level_Intro) {
 			if (Frame_Number == 60) { // this runs once every second
 				++timer;
@@ -471,7 +485,53 @@ void clear_nametable(void) {
 }
 
 void draw_title(void) {
+	PPU_ADDRESS = NAMETABLE0_HIGH + 0x01;
+	PPU_ADDRESS = NAMETABLE0_LOW  + 0xa7;
+	PPU_DATA    = 'B';
+	PPU_DATA    = 'E';
+	PPU_DATA    = 'R';
+	PPU_DATA    = 'T';
+	PPU_DATA    = '\'';
+	PPU_DATA    = 'S';
+	PPU_DATA    = ' ';
+	PPU_DATA    = ' ';
+	PPU_DATA    = 'A';
+	PPU_DATA    = 'D';
+	PPU_DATA    = 'V';
+	PPU_DATA    = 'E';
+	PPU_DATA    = 'N';
+	PPU_DATA    = 'T';
+	PPU_DATA    = 'U';
+	PPU_DATA    = 'R';
+	PPU_DATA    = 'E';
 
+	PPU_ADDRESS = NAMETABLE0_HIGH + 0x06; //05
+	PPU_ADDRESS = NAMETABLE0_LOW  + 0xa6;
+
+	PPU_DATA    = 'P';
+	PPU_DATA    = 'r';
+	PPU_DATA    = 'e';
+	PPU_DATA    = 's';
+	PPU_DATA    = 's';
+	PPU_DATA    = ' ';
+	PPU_DATA    = 'S';
+	PPU_DATA    = 't';
+	PPU_DATA    = 'a';
+	PPU_DATA    = 'r';
+	PPU_DATA    = 't';
+	PPU_DATA    = ' ';
+	PPU_DATA    = 't';
+	PPU_DATA    = 'o';
+	PPU_DATA    = ' ';
+	PPU_DATA    = 'P';
+	PPU_DATA    = 'l';
+	PPU_DATA    = 'a';
+	PPU_DATA    = 'y';
+	PPU_DATA    = ' ';
+
+	//	PPU_DATA    = NUMBER_0 + level_status;
+	clear_nametable();
+	reset_scroll();
 }
 
 void draw_end(void) {
