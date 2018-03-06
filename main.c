@@ -167,6 +167,7 @@ int main(void) {
 		if (game_state == Level) {
 			input_handler();
 			update_sprite();
+			reset_scroll();
 			// for simple levels
 			if ((player_tl.x <= end_x_max && player_tl.x + PLAYER_WIDTH >= end_x_min && 
 				player_tl.y <= end_y_max && player_tl.y + PLAYER_HEIGHT >= end_y_min &&
@@ -181,6 +182,7 @@ int main(void) {
 			} else if (level_status == 4) {
 				level5_tele_logic();
 			}
+			reset_scroll();
 		}
 
 		if (game_state == Level_Passed) {
@@ -190,12 +192,12 @@ int main(void) {
 			passed_level();
 			// set new end_x ... and player position for next level
 			if (level_status == 1) {
-				start_x = 50; // levelT
-				start_y = 66;
-				end_x_min = 50;
-				end_x_max = 50;
-				end_y_min = 60;
-				end_y_max = 70;
+				start_x = 48; // levelT
+				start_y = 64;
+				end_x_min = 136;
+				end_x_max = 144;
+				end_y_min = 176;
+				end_y_max = 192;
 			} else if (level_status == 2) {
 				start_x = 48; // level 3
 				start_y = 88;
@@ -207,10 +209,7 @@ int main(void) {
 			} else if (level_status == 4) {
 				start_x = 24; // level 5
 				start_y = 40;
-				end_x_min = 184;
-				end_x_max = 192;
-				end_y_min = 112;
-				end_y_max = 120;
+				level_switch = 0;
 			} else if (level_status == 5) {
 				game_state = End;
 			}
@@ -366,35 +365,42 @@ void input_handler(void) {
 }
 
 void update_sprite(void) {
-	if (player_state == Going_Up) {
-		// change sprite tile_index
-		player_tl.tile_index = 0x86;
-		player_tr.tile_index = 0x87;
-		player_bl.tile_index = 0x90;
-		player_br.tile_index = 0x91;
-	} else if (player_state == Going_Down) {
-		// change sprite tile_index
-		player_tl.tile_index = 0x84;
-		player_tr.tile_index = 0x85;
-		player_bl.tile_index = 0x90;
-		player_br.tile_index = 0x91;
-	} else if (player_state == Going_Left) {
-		// change sprite tile_index
-		player_tl.tile_index = 0x80;
-		player_tr.tile_index = 0x81;
-		player_bl.tile_index = 0x90;
-		player_br.tile_index = 0x91;
-	} else if (player_state == Going_Right) {
-		// change sprite tile_index
-		player_tl.tile_index = 0x82;
-		player_tr.tile_index = 0x83;
-		player_bl.tile_index = 0x90;
-		player_br.tile_index = 0x91;
-	} else if (player_state == Celebrate) {
+	if (game_state != End) {
+		if (player_state == Going_Up) {
+			// change sprite tile_index
+			player_tl.tile_index = 0x86;
+			player_tr.tile_index = 0x87;
+			player_bl.tile_index = 0x90;
+			player_br.tile_index = 0x91;
+		} else if (player_state == Going_Down) {
+			// change sprite tile_index
+			player_tl.tile_index = 0x84;
+			player_tr.tile_index = 0x85;
+			player_bl.tile_index = 0x90;
+			player_br.tile_index = 0x91;
+		} else if (player_state == Going_Left) {
+			// change sprite tile_index
+			player_tl.tile_index = 0x80;
+			player_tr.tile_index = 0x81;
+			player_bl.tile_index = 0x90;
+			player_br.tile_index = 0x91;
+		} else if (player_state == Going_Right) {
+			// change sprite tile_index
+			player_tl.tile_index = 0x82;
+			player_tr.tile_index = 0x83;
+			player_bl.tile_index = 0x90;
+			player_br.tile_index = 0x91;
+		} else if (player_state == Celebrate) {
+			player_tl.tile_index = 0x88;
+			player_tr.tile_index = 0x89;
+			player_bl.tile_index = 0x98;
+			player_br.tile_index = 0x99;
+		}
+	} else {
 		player_tl.tile_index = 0x88;
 		player_tr.tile_index = 0x89;
 		player_bl.tile_index = 0x98;
-		player_br.tile_index = 0x99;
+		player_br.tile_index = 0x99;		
 	}
 }
 
@@ -462,9 +468,9 @@ void collision_check_horiz(void) {
 			blocked_bot = c_map1[++collision_row][collision_col];
 		} else if (level_status == 1) {
 			blocked = c_map2[collision_row][collision_col];
-			blocked_top = c_map2[--collision_row][collision_col];
-			++collision_row;
-			blocked_bot = c_map2[++collision_row][collision_col];
+			blocked_top = 0;//c_map2[--collision_row][collision_col];
+			// ++collision_row;
+			blocked_bot = 0;//c_map2[++collision_row][collision_col];
 		} else if (level_status == 2) {
 			blocked = c_map3[collision_row][collision_col];
 			blocked_top = c_map3[--collision_row][collision_col];
@@ -502,9 +508,9 @@ void collision_check_horiz(void) {
 			blocked_bot = c_map1[++collision_row][collision_col];
 		} else if (level_status == 1) {
 			blocked = c_map2[collision_row][collision_col];
-			blocked_top = c_map2[--collision_row][collision_col];
+			blocked_top = 0;//c_map2[--collision_row][collision_col];
 			++collision_row;
-			blocked_bot = c_map2[++collision_row][collision_col];
+			blocked_bot = 0;//c_map2[++collision_row][collision_col];
 		} else if (level_status == 2) {
 			blocked = c_map3[collision_row][collision_col];
 			blocked_top = c_map3[--collision_row][collision_col];
@@ -605,19 +611,19 @@ void clear_nametable(void) {
 
 void level3_tele_logic(void) {
 	if (InputPort1 & BUTTON_A) {
-		if (player_tl.x >= 184 && player_tl.x <= 184 + PLAYER_WIDTH &&
-			player_tl.y >= 72 && player_tl.y <= 72 + PLAYER_HEIGHT) {
-			if (level_switch == 0 || level_status == 2) {
+		if (player_tl.x >= 184 - PLAYER_WIDTH && player_tl.x <= 184 + PLAYER_WIDTH &&
+			player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
+			if (level_switch == 0 || level_switch == 2) {
 				start_x = 48;
 				start_y = 88;
-				set_player();
 				level_switch = 2;
+				set_player();
 			} else if (level_switch == 1) {
 				game_state == Level_Passed;
 			}
 		}
-		if (player_tl.x >= 184 && player_tl.x <= 184 + PLAYER_WIDTH &&
-			player_tl.y >= 104 && player_tl.y <= 120 + PLAYER_HEIGHT) {
+		if (player_tl.x >= 184 - PLAYER_WIDTH && player_tl.x <= 184 + PLAYER_WIDTH &&
+			player_tl.y >= 104 - PLAYER_HEIGHT && player_tl.y <= 104 + PLAYER_HEIGHT) {
 			if (level_switch == 0) {
 				start_x = 48;
 				start_y = 88;
@@ -626,8 +632,8 @@ void level3_tele_logic(void) {
 			} else if (level_switch == 1) {
 				start_x = 48;
 				start_y = 88;
-				set_player();
 				level_switch = 2;
+				set_player();
 			} else if (level_switch == 2) {
 				game_state = Level_Passed;
 			}
@@ -637,24 +643,24 @@ void level3_tele_logic(void) {
 
 void level4_tele_logic(void) {
 	if (InputPort1 & BUTTON_A) {
-		if (player_tl.x >= 184 && player_tl.x <= 184 + PLAYER_WIDTH &&
-			player_tl.y >= 72 && player_tl.y <= 72 + PLAYER_HEIGHT) {
-			if (level_switch == 0 || level_status == 2) {
+		if (player_tl.x >= 184 - PLAYER_WIDTH && player_tl.x <= 184 + PLAYER_WIDTH &&
+			player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
+			if (level_switch == 0 || level_switch == 2) {
 				start_x = 48;
 				start_y = 88;
-				set_player();
 				level_switch = 1;
+				set_player();
 			} else if (level_switch == 1) {
 				game_state == Level_Passed;
 			}
 		}
-		if (player_tl.x >= 184 && player_tl.x <= 184 + PLAYER_WIDTH &&
-			player_tl.y >= 104 && player_tl.y <= 120 + PLAYER_HEIGHT) {
+		if (player_tl.x >= 180 - PLAYER_WIDTH && player_tl.x <= 192 + PLAYER_WIDTH &&
+			player_tl.y >= 104 - PLAYER_HEIGHT && player_tl.y <= 104 + PLAYER_HEIGHT) {
 			if (level_switch == 0 || level_switch == 1) {
 				start_x = 48;
 				start_y = 88;
-				set_player();
 				level_switch = 2;
+				set_player();
 			} else if (level_switch == 2) {
 				game_state = Level_Passed;
 			}
@@ -663,7 +669,111 @@ void level4_tele_logic(void) {
 }
 
 void level5_tele_logic(void) {
+	if (InputPort1 & BUTTON_A) {
+		if (player_tl.x >= 64 - PLAYER_WIDTH && player_tl.x <= 64 + PLAYER_WIDTH &&
+			player_tl.y >= 40 - PLAYER_HEIGHT && player_tl.y <= 40 + PLAYER_HEIGHT) {
+			// top-left-top
+			if (level_switch == 0) {
+				start_x = 184; // send to top-right
+				start_y = 56;
+				set_player();
+				level_switch = 0;
+			}
+		}
+		if (player_tl.x >= 24 - PLAYER_WIDTH && player_tl.x <= 24 + PLAYER_WIDTH &&
+			player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
+			// top-left-left
+			if (level_switch == 0) {
+				start_x = 184; // send to top-right
+				start_y = 56;
+				set_player();
+				level_switch = 2;				
+			}
+		}
+		if (player_tl.x >= 64 - PLAYER_WIDTH && player_tl.x <= 64 + PLAYER_WIDTH &&
+			player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
+			// top-left-bottom
+			if (level_switch == 0) {
+				start_x = 120; // send to bottom
+				start_y = 152;
+				set_player();
+				level_switch = 2;		
+			}
+		}
+		if (player_tl.x >= 120 && player_tl.x <= 120 + PLAYER_WIDTH &&
+			player_tl.y >= 104 - PLAYER_HEIGHT && player_tl.y <= 104 + PLAYER_HEIGHT) {
+			// middle
+			if (level_switch == 3) {
+				game_state = Level_Passed;
+			} else {
+				start_x = 24; // send top-left
+				start_y = 40;
+				set_player();
+				level_switch = 0;
+			}
+		}
+		if (player_tl.x >= 224 - PLAYER_WIDTH && player_tl.x <= 224 + PLAYER_WIDTH &&
+			player_tl.y >= 40 - PLAYER_HEIGHT && player_tl.y <= 40 + PLAYER_HEIGHT) {
+			// top-right-top
+			if (level_switch == 0) {
+				start_x = 112; // send to middle
+				start_y = 104;
+				set_player();
+				level_switch = 1;
+			} else if (level_switch == 2) {
+				start_x = 112; // send to middle
+				start_y = 104;
+				set_player();
+				level_switch = 3;
+			}
+		}	
+		if (player_tl.x >= 224 - PLAYER_WIDTH && player_tl.x <= 224 + PLAYER_WIDTH &&
+			player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
+			// top-right-bottom
+			if (level_switch == 2) {
+				start_x = 112; // send to middle
+				start_y = 104;
+				set_player();
+				level_switch = 1;			
+			} else if (level_switch == 0) {
+				start_x = 120; // send to bottom
+				start_y = 152;
+				set_player();
+				level_switch = 1;						
+			}
+		}	
+		if (player_tl.x >= 40 - PLAYER_WIDTH && player_tl.x <= 40 + PLAYER_WIDTH &&
+			player_tl.y >= 200 - PLAYER_HEIGHT && player_tl.y <= 200 + PLAYER_HEIGHT) {
+			// bottom-left
+			if (level_switch == 1) {
+				start_x = 24; // send top-left
+				start_y = 40;
+				set_player();
+				level_switch = 0;
+			} else if (level_switch == 2) {
+				start_x = 24; // send top-left
+				start_y = 40;
+				set_player();
+				level_switch = 0;
+			}
+		}	
+		if (player_tl.x >= 208 - PLAYER_WIDTH && player_tl.x <= 208 + PLAYER_WIDTH &&
+			player_tl.y >= 200 - PLAYER_HEIGHT && player_tl.y <= 200 + PLAYER_HEIGHT) {
+			// bottom-right
+			if (level_switch == 1) {
+				start_x = 112; // send to middle
+				start_y = 104;
+				set_player();
+				level_switch = 3;
+			} else if (level_switch == 2) {
+				start_x = 24; // send top-left
+				start_y = 40;
+				set_player();
+				level_switch = 0;				
+			}
+		}	
 
+	}
 }
 
 void draw_title(void) {
