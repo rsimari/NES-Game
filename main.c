@@ -599,6 +599,27 @@ void level_intro(void) {
 	PPU_DATA    = 'l';
 	PPU_DATA    = ' ';
 	PPU_DATA    = NUMBER_0 + level_status;
+	if (level_status == 0) {
+		reset_scroll();
+		PPU_ADDRESS = NAMETABLE0_HIGH + 0x02;
+		PPU_ADDRESS = NAMETABLE0_LOW  + 0xa8;
+		PPU_DATA = 'P';
+		PPU_DATA = 'r';
+		PPU_DATA = 'e';
+		PPU_DATA = 's';
+		PPU_DATA = 's';
+		PPU_DATA = ' ';
+		PPU_DATA = 'A';
+		PPU_DATA = ' ';
+		PPU_DATA = 't';
+		PPU_DATA = 'o';
+		PPU_DATA = ' ';
+		PPU_DATA = 'E';
+		PPU_DATA = 'n';
+		PPU_DATA = 't';
+		PPU_DATA = 'e';
+		PPU_DATA = 'r';
+	}
 	reset_scroll();
 }
 
