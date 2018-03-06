@@ -43,10 +43,6 @@ typedef struct sprite {
 	uint8_t x; // x coord of sprite
 } sprite_t;
 
-typedef struct meta_sprite {
-	sprite_t sprites[4];
-} meta_sprite_t;
-
 // put sprite in OAM memory segment 
 #pragma bss-name(push, "OAM")
 sprite_t player_tl;

@@ -2,6 +2,8 @@
 
 	Main driver program for NES game
 	date: 2/22/18
+	// change palette for some items on screen to look better,
+	// setup logic for tele's and internal switching
 */
 
 #include <stdint.h>
@@ -14,13 +16,19 @@
 #include "Levels/level1.h"
 #include "Levels/level2.h"
 #include "Levels/levelT.h"
+#include "Levels/level4.h"
+#include "Levels/level5.h"
+#include "Levels/end.h"
 
-const unsigned char * const LEVELS[] = {level1, level2, level3};
+const unsigned char * const LEVELS[] = {level1, level2, level3, level4, level5};
 
 // include level collision maps
 #include "Levels/levelT.csv"
 #include "Levels/level1.csv"
 #include "Levels/level2.csv"
+#include "Levels/level4.csv"
+#include "Levels/level5.csv"
+
 
 const uint8_t PALETTE[] = {
 	COLOR_WHITE, // background color first
@@ -34,8 +42,8 @@ const uint8_t PALETTE[] = {
 	0,0,0,0
 };
 
-enum {Going_Up, Going_Down, Going_Left, Going_Right};
-enum {Title, Level, End, Level_Intro};
+enum {Going_Up, Going_Down, Going_Left, Going_Right, Celebrate};
+enum {Title, Level, Level_Passed, End, Level_Intro};
 
 uint8_t time_min = 0;
 uint8_t time_sec_low = 0;
@@ -61,16 +69,23 @@ uint8_t blocked;
 uint8_t blocked_top;
 uint8_t blocked_bot;
 
+uint8_t level_switch = 0; // changes where the teles go?
+uint8_t level_target = 0; 
+
+uint8_t level4_teles[] = {23*8, 9*8, 23*8, 14*8}; // locations for the teles
+
 uint8_t start_x;    // coordinates of where to start on level
 uint8_t start_y;
 uint8_t end_x_min;  // corners of ending square the player will end on and go to next level
 uint8_t end_x_max;
 uint8_t end_y_min;
 uint8_t end_y_max;
+uint8_t end_drawn = 0;
 
 void reset_scroll(void);
 void set_palette(void);
 void init_player(void);
+void set_player(void);
 void screen_on(void);
 void screen_off(void);
 void update_time(void);
@@ -83,6 +98,7 @@ void collision_check_vert(void);
 void collision_check_horiz(void);
 void passed_level(void);
 void level_intro(void);
+void level4_tele_logic(void);
 void draw_title(void);
 void clear_nametable(void);
 void draw_end(void);
@@ -90,7 +106,7 @@ void draw_end(void);
 // main is called from reset.s
 int main(void) {
 	level_status = 0;
-	game_state = Title; // was Level_Intro;
+	game_state = Title;
 	start_x = 112;
 	start_y = 104;
 	end_x_min = 144;
@@ -98,9 +114,9 @@ int main(void) {
 	end_y_min = 96;
 	end_y_max = 120;
 	screen_off();
-	draw_title();
-	level_intro();
+	// draw_title();
 	set_palette();
+	draw_title();
 	screen_on();
 
 	// main game loop
@@ -108,7 +124,6 @@ int main(void) {
 		WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
 
 		if (game_state == Title) {
-		  draw_title();
 		    if (InputPort1 & BUTTON_START) {
 		      timer = 0;
 		      game_state = Level_Intro;
@@ -139,53 +154,86 @@ int main(void) {
 					Wait_Vblank();
 					screen_on();
 				}
-				Frame_Number = 0;
-			}
-		}		
-		// level has been passed
-		if (game_state == Level) {
-			input_handler();
-			update_sprite();
-			if (player_tl.x <= end_x_max && player_tl.x + PLAYER_WIDTH >= end_x_min && 
-				player_tl.y <= end_y_max && player_tl.y + PLAYER_HEIGHT >= end_y_min) {
-				passed_level();
-				// set new end_x ... and player position for next level
-				if (level_status == 1) {
-					start_x = 50;
-					start_y = 50;
-					end_x_min = 144;
-					end_x_max = 160;
-					end_y_min = 96;
-					end_y_max = 120;
-				} else if (level_status == 2) {
-					start_x = 112;
-					start_y = 104;
-					end_x_min = 144;
-					end_x_max = 160;
-					end_y_min = 96;
-					end_y_max = 120;
-				} else if (level_status == 3) {
-					start_x = 112;
-					start_y = 104;
-					end_x_min = 144;
-					end_x_max = 160;
-					end_y_min = 96;
-					end_y_max = 120;
-				}
-				// draw the next level intro
-				game_state = Level_Intro;
-				screen_off();
-				clear_nametable();
-				Wait_Vblank();
-				screen_on();
-				level_intro();
-				init_player();
-			}
-			if (Frame_Number == 60) {
-				add_second();
 				update_time();
 				Frame_Number = 0;
 			}
+		}		
+
+		if (game_state == Level) {
+			input_handler();
+			update_sprite();
+			if ((player_tl.x <= end_x_max && player_tl.x + PLAYER_WIDTH >= end_x_min && 
+				player_tl.y <= end_y_max && player_tl.y + PLAYER_HEIGHT >= end_y_min &&
+				BUTTON_A & InputPort1 && level_switch == level_target)) {
+				game_state = Level_Passed;
+			} else if (level_status == 3) {
+				// check for teleports
+				level4_tele_logic();
+			}
+		}
+
+		if (game_state == Level_Passed) {
+			player_state = Celebrate;
+			update_sprite();
+			game_state = Level_Intro;
+			passed_level();
+			// set new end_x ... and player position for next level
+			if (level_status == 1) {
+				game_state = End;
+				start_x = 50;
+				start_y = 50;
+				end_x_min = 50;
+				end_x_max = 50;
+				end_y_min = 50;
+				end_y_max = 50;
+			} else if (level_status == 2) {
+				start_x = 50;
+				start_y = 50;
+				end_x_min = 50;
+				end_x_max = 50;
+				end_y_min = 50;
+				end_y_max = 50;
+			} else if (level_status == 3) {
+				start_x = 48;
+				start_y = 88;
+				end_x_min = 184;
+				end_x_max = 200;
+				end_y_min = 72;
+				end_y_max = 88;
+				level_target = 1;
+			} else if (level_status == 4) {
+				start_x = 24;
+				start_y = 40;
+				end_x_min = 184;
+				end_x_max = 192;
+				end_y_min = 112;
+				end_y_max = 120;
+			}
+			// draw the next level intro
+			screen_off();
+			clear_nametable();
+			Wait_Vblank();
+			screen_on();
+			level_intro();
+			set_player();
+		}
+
+		if (game_state == End) {
+			input_handler();
+			update_sprite();
+			if (end_drawn == 0) {
+				draw_end();
+				end_drawn = 1;
+				start_x = 40;
+				start_y = 40;
+				set_player();
+			}
+		}
+
+		if (game_state != End && Frame_Number == 60) {
+			add_second();
+			update_time();
+			Frame_Number = 0;
 		}
 	}
 
@@ -231,6 +279,24 @@ void init_player(void) {
 	player_br.y = MIN_Y + Y + 8;
 	player_br.attributes = 0x00;
 	player_br.tile_index = 0x91;
+	reset_scroll();
+}
+
+void set_player(void) {
+	// set player location for 2x2 player sprite
+	X = start_x;
+	Y = start_y;
+	player_tl.x = MIN_X + X;
+	player_tl.y = MIN_Y + Y;
+
+	player_tr.x = MIN_X + X + 8;
+	player_tr.y = MIN_Y + Y;
+
+	player_bl.x = MIN_X + X;
+	player_bl.y = MIN_Y + Y + 8;
+
+	player_br.x = MIN_X + X + 8;
+	player_br.y = MIN_Y + Y + 8;
 	reset_scroll();
 }
 
@@ -297,18 +363,31 @@ void update_sprite(void) {
 		// change sprite tile_index
 		player_tl.tile_index = 0x86;
 		player_tr.tile_index = 0x87;
+		player_bl.tile_index = 0x90;
+		player_br.tile_index = 0x91;
 	} else if (player_state == Going_Down) {
 		// change sprite tile_index
 		player_tl.tile_index = 0x84;
 		player_tr.tile_index = 0x85;
+		player_bl.tile_index = 0x90;
+		player_br.tile_index = 0x91;
 	} else if (player_state == Going_Left) {
 		// change sprite tile_index
 		player_tl.tile_index = 0x80;
 		player_tr.tile_index = 0x81;
+		player_bl.tile_index = 0x90;
+		player_br.tile_index = 0x91;
 	} else if (player_state == Going_Right) {
 		// change sprite tile_index
 		player_tl.tile_index = 0x82;
 		player_tr.tile_index = 0x83;
+		player_bl.tile_index = 0x90;
+		player_br.tile_index = 0x91;
+	} else if (player_state == Celebrate) {
+		player_tl.tile_index = 0x88;
+		player_tr.tile_index = 0x89;
+		player_bl.tile_index = 0x98;
+		player_br.tile_index = 0x99;
 	}
 }
 
@@ -342,6 +421,10 @@ void draw_background(void) {
 		UnRLE(level2);
 	} else if (level_status == 2) {
 		UnRLE(level3);
+	} else if (level_status == 3) {
+		UnRLE(level4);
+	} else if (level_status == 4) {
+		UnRLE(level5);
 	}
 	reset_scroll();
 }
@@ -380,6 +463,16 @@ void collision_check_horiz(void) {
 			blocked_top = c_map3[--collision_row][collision_col];
 			++collision_row;
 			blocked_bot = c_map3[++collision_row][collision_col];
+		} else if (level_status == 3) {
+			blocked = c_map4[collision_row][collision_col];
+			blocked_top = c_map4[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map4[++collision_row][collision_col];
+		} else if (level_status == 4) {
+			blocked = c_map5[collision_row][collision_col];
+			blocked_top = c_map5[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map5[++collision_row][collision_col];
 		}
 		if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 				--player_tl.x;
@@ -410,6 +503,16 @@ void collision_check_horiz(void) {
 			blocked_top = c_map3[--collision_row][collision_col];
 			++collision_row;
 			blocked_bot = c_map3[++collision_row][collision_col];
+		} else if (level_status == 3) {
+			blocked = c_map4[collision_row][collision_col];
+			blocked_top = c_map4[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map4[++collision_row][collision_col];
+		} else if (level_status == 4) {
+			blocked = c_map5[collision_row][collision_col];
+			blocked_top = c_map5[--collision_row][collision_col];
+			++collision_row;
+			blocked_bot = c_map5[++collision_row][collision_col];
 		}
 		if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 			++player_tl.x;
@@ -432,6 +535,10 @@ void collision_check_vert(void) {
 			blocked = c_map2[collision_row][collision_col];
 		} else if (level_status == 2) {
 			blocked = c_map3[collision_row][collision_col];
+		} else if (level_status == 3) {
+			blocked = c_map4[collision_row][collision_col];
+		} else if (level_status == 4) {
+			blocked = c_map5[collision_row][collision_col];
 		}
 		if (blocked != 0) {
 			++player_tl.y;
@@ -450,6 +557,10 @@ void collision_check_vert(void) {
 			blocked = c_map2[collision_row][collision_col];
 		} else if (level_status == 2) {
 			blocked = c_map3[collision_row][collision_col];
+		} else if (level_status == 3) {
+			blocked = c_map4[collision_row][collision_col];
+		} else if (level_status == 4) {
+			blocked = c_map5[collision_row][collision_col];
 		}
 		if (blocked != 0) {
 			--player_tl.y;
@@ -462,6 +573,7 @@ void collision_check_vert(void) {
 
 void passed_level(void) {
 	++level_status;
+	level_switch = 0;
 }
 
 void level_intro(void) {
@@ -482,6 +594,33 @@ void clear_nametable(void) {
 	PPU_ADDRESS = NAMETABLE0_LOW;
 	UnRLE(empty);
 	reset_scroll();
+}
+
+void level4_tele_logic(void) {
+	if (InputPort1 & BUTTON_A && ~InputPort1Prev & 0x7f) {
+		if (player_tl.x >= level4_teles[0] && player_tl.x <= level4_teles[0] + PLAYER_WIDTH &&
+			player_tl.y >= level4_teles[1] && player_tl.y <= level4_teles[1] + PLAYER_HEIGHT) {
+			// if (level_switch == 0) {
+			// 	start_x = 48;
+			// 	start_y = 88;
+			// 	init_player();
+			// 	level_switch = 1;
+			// } else if (level_switch == 1) {
+			// 	game_state == Level_Passed;
+			// }
+		}
+		// } else if (player_tl.x >= level4_teles[2] && player_tl.x <= level4_teles[2] + PLAYER_WIDTH &&
+		// 	player_tl.y >= level4_teles[3] && player_tl.y <= level4_teles[3] + PLAYER_HEIGHT) {
+		// 	if (level_switch == 0) {
+		// 		start_x = 48;
+		// 		start_y = 88;
+		// 		init_player();
+		// 		level_switch = 1;
+		// 	} else if (level_switch == 1) {
+				
+		// 	}
+		// }
+	}
 }
 
 void draw_title(void) {
@@ -529,12 +668,31 @@ void draw_title(void) {
 	PPU_DATA    = 'y';
 	PPU_DATA    = ' ';
 
-	//	PPU_DATA    = NUMBER_0 + level_status;
-	clear_nametable();
 	reset_scroll();
 }
 
 void draw_end(void) {
+	// draw empty background
+	screen_off();
+	PPU_ADDRESS = NAMETABLE0_HIGH;
+	PPU_ADDRESS = NAMETABLE0_LOW;
+	UnRLE(end);
+	Wait_Vblank();
+	screen_on();
+	reset_scroll();
 
+	// draw their time
+	PPU_ADDRESS = NAMETABLE0_HIGH + 0x01;
+	PPU_ADDRESS = NAMETABLE0_LOW  + 0x8a;
+	PPU_DATA = 'T';
+	PPU_DATA = 'i';
+	PPU_DATA = 'm';
+	PPU_DATA = 'e';
+	PPU_DATA = ' ';
+	PPU_DATA = NUMBER_0 + time_min;
+	PPU_DATA = 0x3a; // ':'
+	PPU_DATA = NUMBER_0 + time_sec_high;
+	PPU_DATA = NUMBER_0 + time_sec_low;
+	reset_scroll();
 }
 
