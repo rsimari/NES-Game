@@ -35,12 +35,6 @@
 	.export		_c_map2
 	.export		_c_map5
 	.export		_c_map4
-	.export		_END1
-	.export		_END2
-	.export		_END3
-	.export		_END4
-	.export		_END5
-	.export		_END6
 	.export		_PALETTE
 	.export		_time_min
 	.export		_time_sec_low
@@ -1956,38 +1950,6 @@ _c_map3:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -2154,8 +2116,8 @@ _c_map3:
 	.byte	$01
 	.byte	$00
 	.byte	$00
-	.byte	$01
-	.byte	$01
+	.byte	$00
+	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -2251,8 +2213,8 @@ _c_map3:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$01
@@ -2277,10 +2239,10 @@ _c_map3:
 	.byte	$00
 	.byte	$01
 	.byte	$01
-	.byte	$00
-	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$01
@@ -2398,11 +2360,11 @@ _c_map3:
 	.byte	$00
 	.byte	$01
 	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -2413,7 +2375,7 @@ _c_map3:
 	.byte	$00
 	.byte	$00
 	.byte	$01
-	.byte	$00
+	.byte	$01
 	.byte	$00
 	.byte	$01
 	.byte	$00
@@ -2737,6 +2699,38 @@ _c_map3:
 	.byte	$01
 	.byte	$01
 	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -6615,19 +6609,6 @@ _c_map4:
 	.byte	$01
 	.byte	$01
 	.byte	$01
-_END1:
-	.byte	$54,$68,$61,$6E,$6B,$73,$20,$66,$6F,$72,$20,$70,$6C,$61,$79,$69
-	.byte	$6E,$67,$21,$00
-_END2:
-	.byte	$44,$65,$76,$65,$6C,$6F,$70,$65,$64,$20,$62,$79,$2C,$00
-_END3:
-	.byte	$52,$6F,$62,$65,$72,$74,$2C,$00
-_END4:
-	.byte	$54,$72,$61,$76,$69,$73,$2C,$00
-_END5:
-	.byte	$45,$64,$64,$69,$65,$2C,$00
-_END6:
-	.byte	$61,$6E,$64,$20,$42,$65,$6E,$00
 _PALETTE:
 	.byte	$20
 	.byte	$0C
@@ -6792,12 +6773,12 @@ _end_y_max:
 ;
 	sta     _i
 	sta     _i+1
-L1A52:	lda     _i+1
+L1A5B:	lda     _i+1
 	cmp     #$00
-	bne     L1A5A
+	bne     L1A63
 	lda     _i
 	cmp     #$20
-L1A5A:	bcs     L1A53
+L1A63:	bcs     L1A5C
 ;
 ; PPU_DATA = PALETTE[i];
 ;
@@ -6814,13 +6795,13 @@ L1A5A:	bcs     L1A53
 ; for (i = 0; i < sizeof(PALETTE); ++i) // always use ++i, instead of i++
 ;
 	inc     _i
-	bne     L1A52
+	bne     L1A5B
 	inc     _i+1
-	jmp     L1A52
+	jmp     L1A5B
 ;
 ; reset_scroll();
 ;
-L1A53:	jmp     _reset_scroll
+L1A5C:	jmp     _reset_scroll
 
 .endproc
 
@@ -7135,7 +7116,7 @@ L1A53:	jmp     _reset_scroll
 ;
 	lda     _InputPort1
 	and     #$08
-	beq     L1D05
+	beq     L1D8A
 ;
 ; --player_tr.y;
 ;
@@ -7160,9 +7141,9 @@ L1A53:	jmp     _reset_scroll
 ;
 ; if (InputPort1 & BUTTON_DOWN) {
 ;
-L1D05:	lda     _InputPort1
+L1D8A:	lda     _InputPort1
 	and     #$04
-	beq     L1AD4
+	beq     L1ADD
 ;
 ; ++player_tr.y;
 ;
@@ -7187,13 +7168,13 @@ L1D05:	lda     _InputPort1
 ;
 ; collision_check_vert();
 ;
-L1AD4:	jsr     _collision_check_vert
+L1ADD:	jsr     _collision_check_vert
 ;
 ; if (InputPort1 & BUTTON_LEFT) {
 ;
 	lda     _InputPort1
 	and     #$02
-	beq     L1D06
+	beq     L1D8B
 ;
 ; --player_tl.x;
 ;
@@ -7218,9 +7199,9 @@ L1AD4:	jsr     _collision_check_vert
 ;
 ; if (InputPort1 & BUTTON_RIGHT) {
 ;
-L1D06:	lda     _InputPort1
+L1D8B:	lda     _InputPort1
 	and     #$01
-	beq     L1AE5
+	beq     L1AEE
 ;
 ; ++player_tl.x;
 ;
@@ -7245,7 +7226,7 @@ L1D06:	lda     _InputPort1
 ;
 ; collision_check_horiz();
 ;
-L1AE5:	jmp     _collision_check_horiz
+L1AEE:	jmp     _collision_check_horiz
 
 .endproc
 
@@ -7263,7 +7244,7 @@ L1AE5:	jmp     _collision_check_horiz
 ; if (player_state == Going_Up) {
 ;
 	lda     _player_state
-	bne     L1D08
+	bne     L1D8D
 ;
 ; player_tl.tile_index = 0x86;
 ;
@@ -7286,10 +7267,10 @@ L1AE5:	jmp     _collision_check_horiz
 ;
 ; } else if (player_state == Going_Down) {
 ;
-	jmp     L1D07
-L1D08:	lda     _player_state
+	jmp     L1D8C
+L1D8D:	lda     _player_state
 	cmp     #$01
-	bne     L1D09
+	bne     L1D8E
 ;
 ; player_tl.tile_index = 0x84;
 ;
@@ -7312,10 +7293,10 @@ L1D08:	lda     _player_state
 ;
 ; } else if (player_state == Going_Left) {
 ;
-	jmp     L1D07
-L1D09:	lda     _player_state
+	jmp     L1D8C
+L1D8E:	lda     _player_state
 	cmp     #$02
-	bne     L1D0A
+	bne     L1D8F
 ;
 ; player_tl.tile_index = 0x80;
 ;
@@ -7338,10 +7319,10 @@ L1D09:	lda     _player_state
 ;
 ; } else if (player_state == Going_Right) {
 ;
-	jmp     L1D07
-L1D0A:	lda     _player_state
+	jmp     L1D8C
+L1D8F:	lda     _player_state
 	cmp     #$03
-	bne     L1D0B
+	bne     L1D90
 ;
 ; player_tl.tile_index = 0x82;
 ;
@@ -7364,10 +7345,10 @@ L1D0A:	lda     _player_state
 ;
 ; } else if (player_state == Celebrate) {
 ;
-	jmp     L1D07
-L1D0B:	lda     _player_state
+	jmp     L1D8C
+L1D90:	lda     _player_state
 	cmp     #$04
-	bne     L1B1B
+	bne     L1B24
 ;
 ; player_tl.tile_index = 0x88;
 ;
@@ -7387,11 +7368,11 @@ L1D0B:	lda     _player_state
 ; player_br.tile_index = 0x99;
 ;
 	lda     #$99
-L1D07:	sta     _player_br+1
+L1D8C:	sta     _player_br+1
 ;
 ; }
 ;
-L1B1B:	rts
+L1B24:	rts
 
 .endproc
 
@@ -7410,7 +7391,7 @@ L1B1B:	rts
 ;
 	lda     _time_sec_low
 	cmp     #$09
-	bcs     L1D0C
+	bcs     L1D91
 ;
 ; ++time_sec_low;
 ;
@@ -7419,9 +7400,9 @@ L1B1B:	rts
 ; else if (time_sec_low == 9) {
 ;
 	rts
-L1D0C:	lda     _time_sec_low
+L1D91:	lda     _time_sec_low
 	cmp     #$09
-	bne     L1B39
+	bne     L1B42
 ;
 ; time_sec_low = 0;
 ;
@@ -7432,7 +7413,7 @@ L1D0C:	lda     _time_sec_low
 ;
 	lda     _time_sec_high
 	cmp     #$05
-	bcs     L1D0D
+	bcs     L1D92
 ;
 ; ++time_sec_high;
 ;
@@ -7441,9 +7422,9 @@ L1D0C:	lda     _time_sec_low
 ; else if (time_sec_high == 5) {
 ;
 	rts
-L1D0D:	lda     _time_sec_high
+L1D92:	lda     _time_sec_high
 	cmp     #$05
-	bne     L1B39
+	bne     L1B42
 ;
 ; time_sec_high = 0;
 ;
@@ -7454,7 +7435,7 @@ L1D0D:	lda     _time_sec_high
 ;
 	lda     _time_min
 	cmp     #$09
-	bcs     L1D0E
+	bcs     L1D93
 ;
 ; ++time_min;
 ;
@@ -7466,7 +7447,7 @@ L1D0D:	lda     _time_sec_high
 ;
 ; time_min = 0;
 ;
-L1D0E:	lda     #$00
+L1D93:	lda     #$00
 	sta     _time_min
 ;
 ; time_sec_high = 0;
@@ -7479,7 +7460,7 @@ L1D0E:	lda     #$00
 ;
 ; }
 ;
-L1B39:	rts
+L1B42:	rts
 
 .endproc
 
@@ -7507,7 +7488,7 @@ L1B39:	rts
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1D10
+	bne     L1D95
 ;
 ; UnRLE(level1);
 ;
@@ -7516,10 +7497,10 @@ L1B39:	rts
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L1D0F
-L1D10:	lda     _level_status
+	jmp     L1D94
+L1D95:	lda     _level_status
 	cmp     #$01
-	bne     L1D11
+	bne     L1D96
 ;
 ; UnRLE(level2);
 ;
@@ -7528,10 +7509,10 @@ L1D10:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1D0F
-L1D11:	lda     _level_status
+	jmp     L1D94
+L1D96:	lda     _level_status
 	cmp     #$02
-	bne     L1D12
+	bne     L1D97
 ;
 ; UnRLE(level3);
 ;
@@ -7540,10 +7521,10 @@ L1D11:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1D0F
-L1D12:	lda     _level_status
+	jmp     L1D94
+L1D97:	lda     _level_status
 	cmp     #$03
-	bne     L1D13
+	bne     L1D98
 ;
 ; UnRLE(level4);
 ;
@@ -7552,20 +7533,20 @@ L1D12:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1D0F
-L1D13:	lda     _level_status
+	jmp     L1D94
+L1D98:	lda     _level_status
 	cmp     #$04
-	bne     L1B5B
+	bne     L1B64
 ;
 ; UnRLE(level5);
 ;
 	lda     #<(_level5)
 	ldx     #>(_level5)
-L1D0F:	jsr     _UnRLE
+L1D94:	jsr     _UnRLE
 ;
 ; reset_scroll();
 ;
-L1B5B:	jmp     _reset_scroll
+L1B64:	jmp     _reset_scroll
 
 .endproc
 
@@ -7614,9 +7595,9 @@ L1B5B:	jmp     _reset_scroll
 	lda     _player_left_side
 	clc
 	adc     _player_right_side
-	bcc     L1D14
+	bcc     L1D99
 	inx
-L1D14:	jsr     shrax1
+L1D99:	jsr     shrax1
 	sta     _player_center_x
 ;
 ; player_center_y   = (player_top + player_bottom) >> 1;
@@ -7625,9 +7606,9 @@ L1D14:	jsr     shrax1
 	lda     _player_top
 	clc
 	adc     _player_bottom
-	bcc     L1D15
+	bcc     L1D9A
 	inx
-L1D15:	jsr     shrax1
+L1D9A:	jsr     shrax1
 	sta     _player_center_y
 ;
 ; }
@@ -7655,7 +7636,7 @@ L1D15:	jsr     shrax1
 ;
 	lda     _InputPort1
 	and     #$08
-	jeq     L1D27
+	jeq     L1DAC
 ;
 ; collision_row = player_top >> 3;
 ;
@@ -7676,7 +7657,7 @@ L1D15:	jsr     shrax1
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1D22
+	bne     L1DA7
 ;
 ; blocked = c_map1[collision_row][collision_col];
 ;
@@ -7694,10 +7675,10 @@ L1D15:	jsr     shrax1
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L1D33
-L1D22:	lda     _level_status
+	jmp     L1DB8
+L1DA7:	lda     _level_status
 	cmp     #$01
-	bne     L1D23
+	bne     L1DA8
 ;
 ; blocked = c_map2[collision_row][collision_col];
 ;
@@ -7715,10 +7696,10 @@ L1D22:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1D33
-L1D23:	lda     _level_status
+	jmp     L1DB8
+L1DA8:	lda     _level_status
 	cmp     #$02
-	bne     L1D24
+	bne     L1DA9
 ;
 ; blocked = c_map3[collision_row][collision_col];
 ;
@@ -7736,10 +7717,10 @@ L1D23:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1D33
-L1D24:	lda     _level_status
+	jmp     L1DB8
+L1DA9:	lda     _level_status
 	cmp     #$03
-	bne     L1D25
+	bne     L1DAA
 ;
 ; blocked = c_map4[collision_row][collision_col];
 ;
@@ -7757,10 +7738,10 @@ L1D24:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1D33
-L1D25:	lda     _level_status
+	jmp     L1DB8
+L1DAA:	lda     _level_status
 	cmp     #$04
-	bne     L1D26
+	bne     L1DAB
 ;
 ; blocked = c_map5[collision_row][collision_col];
 ;
@@ -7775,15 +7756,15 @@ L1D25:	lda     _level_status
 	sta     ptr1
 	lda     tmp1
 	adc     #>(_c_map5)
-L1D33:	sta     ptr1+1
+L1DB8:	sta     ptr1+1
 	ldy     _collision_col
 	lda     (ptr1),y
 	sta     _blocked
 ;
 ; if (blocked != 0) {
 ;
-L1D26:	lda     _blocked
-	beq     L1D27
+L1DAB:	lda     _blocked
+	beq     L1DAC
 ;
 ; ++player_tl.y;
 ;
@@ -7803,9 +7784,9 @@ L1D26:	lda     _blocked
 ;
 ; if (InputPort1 & BUTTON_DOWN) {
 ;
-L1D27:	lda     _InputPort1
+L1DAC:	lda     _InputPort1
 	and     #$04
-	bne     L1D35
+	bne     L1DBA
 ;
 ; }
 ;
@@ -7813,7 +7794,7 @@ L1D27:	lda     _InputPort1
 ;
 ; collision_row = player_bottom >> 3;
 ;
-L1D35:	lda     _player_bottom
+L1DBA:	lda     _player_bottom
 	lsr     a
 	lsr     a
 	lsr     a
@@ -7830,7 +7811,7 @@ L1D35:	lda     _player_bottom
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1D28
+	bne     L1DAD
 ;
 ; blocked = c_map1[collision_row][collision_col];
 ;
@@ -7848,10 +7829,10 @@ L1D35:	lda     _player_bottom
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L1D34
-L1D28:	lda     _level_status
+	jmp     L1DB9
+L1DAD:	lda     _level_status
 	cmp     #$01
-	bne     L1D29
+	bne     L1DAE
 ;
 ; blocked = c_map2[collision_row][collision_col];
 ;
@@ -7869,10 +7850,10 @@ L1D28:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1D34
-L1D29:	lda     _level_status
+	jmp     L1DB9
+L1DAE:	lda     _level_status
 	cmp     #$02
-	bne     L1D2A
+	bne     L1DAF
 ;
 ; blocked = c_map3[collision_row][collision_col];
 ;
@@ -7890,10 +7871,10 @@ L1D29:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1D34
-L1D2A:	lda     _level_status
+	jmp     L1DB9
+L1DAF:	lda     _level_status
 	cmp     #$03
-	bne     L1D2B
+	bne     L1DB0
 ;
 ; blocked = c_map4[collision_row][collision_col];
 ;
@@ -7911,10 +7892,10 @@ L1D2A:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1D34
-L1D2B:	lda     _level_status
+	jmp     L1DB9
+L1DB0:	lda     _level_status
 	cmp     #$04
-	bne     L1D2C
+	bne     L1DB1
 ;
 ; blocked = c_map5[collision_row][collision_col];
 ;
@@ -7929,15 +7910,15 @@ L1D2B:	lda     _level_status
 	sta     ptr1
 	lda     tmp1
 	adc     #>(_c_map5)
-L1D34:	sta     ptr1+1
+L1DB9:	sta     ptr1+1
 	ldy     _collision_col
 	lda     (ptr1),y
 	sta     _blocked
 ;
 ; if (blocked != 0) {
 ;
-L1D2C:	lda     _blocked
-	beq     L1C91
+L1DB1:	lda     _blocked
+	beq     L1C9A
 ;
 ; --player_tl.y;
 ;
@@ -7957,7 +7938,7 @@ L1D2C:	lda     _blocked
 ;
 ; }
 ;
-L1C91:	rts
+L1C9A:	rts
 
 .endproc
 
@@ -7993,7 +7974,7 @@ L1C91:	rts
 ;
 	lda     _InputPort1
 	and     #$01
-	jeq     L1D5D
+	jeq     L1DE2
 ;
 ; collision_row = player_center_y >> 3;
 ;
@@ -8014,7 +7995,7 @@ L1C91:	rts
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1D56
+	bne     L1DDB
 ;
 ; blocked = c_map1[collision_row][collision_col];
 ;
@@ -8074,10 +8055,10 @@ L1C91:	rts
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L1D6A
-L1D56:	lda     _level_status
+	jmp     L1DEF
+L1DDB:	lda     _level_status
 	cmp     #$01
-	bne     L1D57
+	bne     L1DDC
 ;
 ; blocked = c_map2[collision_row][collision_col];
 ;
@@ -8137,10 +8118,10 @@ L1D56:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1D6A
-L1D57:	lda     _level_status
+	jmp     L1DEF
+L1DDC:	lda     _level_status
 	cmp     #$02
-	bne     L1D58
+	bne     L1DDD
 ;
 ; blocked = c_map3[collision_row][collision_col];
 ;
@@ -8200,10 +8181,10 @@ L1D57:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1D6A
-L1D58:	lda     _level_status
+	jmp     L1DEF
+L1DDD:	lda     _level_status
 	cmp     #$03
-	bne     L1D59
+	bne     L1DDE
 ;
 ; blocked = c_map4[collision_row][collision_col];
 ;
@@ -8263,10 +8244,10 @@ L1D58:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1D6A
-L1D59:	lda     _level_status
+	jmp     L1DEF
+L1DDE:	lda     _level_status
 	cmp     #$04
-	bne     L1D5A
+	bne     L1DDF
 ;
 ; blocked = c_map5[collision_row][collision_col];
 ;
@@ -8323,23 +8304,23 @@ L1D59:	lda     _level_status
 	sta     ptr1
 	lda     tmp1
 	adc     #>(_c_map5)
-L1D6A:	sta     ptr1+1
+L1DEF:	sta     ptr1+1
 	ldy     _collision_col
 	lda     (ptr1),y
 	sta     _blocked_bot
 ;
 ; if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 ;
-L1D5A:	lda     _blocked
-	bne     L1D5B
+L1DDF:	lda     _blocked
+	bne     L1DE0
 	lda     _blocked_top
-	bne     L1D5B
+	bne     L1DE0
 	lda     _blocked_bot
-	beq     L1D5D
+	beq     L1DE2
 ;
 ; --player_tl.x;
 ;
-L1D5B:	dec     _player_tl+3
+L1DE0:	dec     _player_tl+3
 ;
 ; --player_bl.x;
 ;
@@ -8356,7 +8337,7 @@ L1D5B:	dec     _player_tl+3
 ; blocked = 0;
 ;
 	lda     #$00
-L1D5D:	sta     _blocked
+L1DE2:	sta     _blocked
 ;
 ; blocked_top = 0;
 ;
@@ -8370,7 +8351,7 @@ L1D5D:	sta     _blocked
 ;
 	lda     _InputPort1
 	and     #$02
-	bne     L1D6C
+	bne     L1DF1
 ;
 ; }
 ;
@@ -8378,7 +8359,7 @@ L1D5D:	sta     _blocked
 ;
 ; collision_row = player_center_y >> 3;
 ;
-L1D6C:	lda     _player_center_y
+L1DF1:	lda     _player_center_y
 	lsr     a
 	lsr     a
 	lsr     a
@@ -8395,7 +8376,7 @@ L1D6C:	lda     _player_center_y
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1D5E
+	bne     L1DE3
 ;
 ; blocked = c_map1[collision_row][collision_col];
 ;
@@ -8455,10 +8436,10 @@ L1D6C:	lda     _player_center_y
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L1D6B
-L1D5E:	lda     _level_status
+	jmp     L1DF0
+L1DE3:	lda     _level_status
 	cmp     #$01
-	bne     L1D5F
+	bne     L1DE4
 ;
 ; blocked = c_map2[collision_row][collision_col];
 ;
@@ -8518,10 +8499,10 @@ L1D5E:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1D6B
-L1D5F:	lda     _level_status
+	jmp     L1DF0
+L1DE4:	lda     _level_status
 	cmp     #$02
-	bne     L1D60
+	bne     L1DE5
 ;
 ; blocked = c_map3[collision_row][collision_col];
 ;
@@ -8581,10 +8562,10 @@ L1D5F:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1D6B
-L1D60:	lda     _level_status
+	jmp     L1DF0
+L1DE5:	lda     _level_status
 	cmp     #$03
-	bne     L1D61
+	bne     L1DE6
 ;
 ; blocked = c_map4[collision_row][collision_col];
 ;
@@ -8644,10 +8625,10 @@ L1D60:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1D6B
-L1D61:	lda     _level_status
+	jmp     L1DF0
+L1DE6:	lda     _level_status
 	cmp     #$04
-	bne     L1D62
+	bne     L1DE7
 ;
 ; blocked = c_map5[collision_row][collision_col];
 ;
@@ -8704,24 +8685,24 @@ L1D61:	lda     _level_status
 	sta     ptr1
 	lda     tmp1
 	adc     #>(_c_map5)
-L1D6B:	sta     ptr1+1
+L1DF0:	sta     ptr1+1
 	ldy     _collision_col
 	lda     (ptr1),y
 	sta     _blocked_bot
 ;
 ; if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 ;
-L1D62:	lda     _blocked
-	bne     L1D63
+L1DE7:	lda     _blocked
+	bne     L1DE8
 	lda     _blocked_top
-	bne     L1D63
+	bne     L1DE8
 	lda     _blocked_bot
-	bne     L1D63
+	bne     L1DE8
 	rts
 ;
 ; ++player_tl.x;
 ;
-L1D63:	inc     _player_tl+3
+L1DE8:	inc     _player_tl+3
 ;
 ; ++player_bl.x;
 ;
@@ -8846,47 +8827,47 @@ L1D63:	inc     _player_tl+3
 ;
 	lda     _InputPort1
 	and     #$80
-	beq     L1D6F
+	beq     L1DF4
 	lda     _InputPort1Prev
 	eor     #$FF
 	and     #$7F
-	bne     L1D70
-L1D6F:	rts
+	bne     L1DF5
+L1DF4:	rts
 ;
 ; if (player_tl.x >= level4_teles[0] && player_tl.x <= level4_teles[0] + PLAYER_WIDTH &&
 ;
-L1D70:	lda     _player_tl+3
+L1DF5:	lda     _player_tl+3
 	cmp     _level4_teles
-	bcc     L1D72
+	bcc     L1DF7
 	jsr     pusha0
 	lda     _level4_teles
 	clc
 	adc     #$08
-	bcc     L1CCD
+	bcc     L1CD6
 	ldx     #$01
-L1CCD:	jsr     tosicmp
-	beq     L1D6D
-	bcs     L1D72
+L1CD6:	jsr     tosicmp
+	beq     L1DF2
+	bcs     L1DF7
 ;
 ; player_tl.y >= level4_teles[1] && player_tl.y <= level4_teles[1] + PLAYER_HEIGHT) {
 ;
-L1D6D:	lda     _player_tl
+L1DF2:	lda     _player_tl
 	cmp     _level4_teles+1
-	bcc     L1D72
+	bcc     L1DF7
 	jsr     pusha0
 	lda     _level4_teles+1
 	clc
 	adc     #$10
-	bcc     L1CD0
+	bcc     L1CD9
 	ldx     #$01
-L1CD0:	jsr     tosicmp
-	bcc     L1CC9
-	beq     L1CC9
-L1D72:	rts
+L1CD9:	jsr     tosicmp
+	bcc     L1CD2
+	beq     L1CD2
+L1DF7:	rts
 ;
 ; }
 ;
-L1CC9:	rts
+L1CD2:	rts
 
 .endproc
 
@@ -8901,9 +8882,212 @@ L1CC9:	rts
 .segment	"CODE"
 
 ;
-; }
+; PPU_ADDRESS = NAMETABLE0_HIGH + 0x01;
 ;
-	rts
+	lda     #$21
+	sta     $2006
+;
+; PPU_ADDRESS = NAMETABLE0_LOW  + 0xa7;
+;
+	lda     #$A7
+	sta     $2006
+;
+; PPU_DATA    = 'B';
+;
+	lda     #$42
+	sta     $2007
+;
+; PPU_DATA    = 'E';
+;
+	lda     #$45
+	sta     $2007
+;
+; PPU_DATA    = 'R';
+;
+	lda     #$52
+	sta     $2007
+;
+; PPU_DATA    = 'T';
+;
+	lda     #$54
+	sta     $2007
+;
+; PPU_DATA    = '\'';
+;
+	lda     #$27
+	sta     $2007
+;
+; PPU_DATA    = 'S';
+;
+	lda     #$53
+	sta     $2007
+;
+; PPU_DATA    = ' ';
+;
+	lda     #$20
+	sta     $2007
+;
+; PPU_DATA    = ' ';
+;
+	sta     $2007
+;
+; PPU_DATA    = 'A';
+;
+	lda     #$41
+	sta     $2007
+;
+; PPU_DATA    = 'D';
+;
+	lda     #$44
+	sta     $2007
+;
+; PPU_DATA    = 'V';
+;
+	lda     #$56
+	sta     $2007
+;
+; PPU_DATA    = 'E';
+;
+	lda     #$45
+	sta     $2007
+;
+; PPU_DATA    = 'N';
+;
+	lda     #$4E
+	sta     $2007
+;
+; PPU_DATA    = 'T';
+;
+	lda     #$54
+	sta     $2007
+;
+; PPU_DATA    = 'U';
+;
+	lda     #$55
+	sta     $2007
+;
+; PPU_DATA    = 'R';
+;
+	lda     #$52
+	sta     $2007
+;
+; PPU_DATA    = 'E';
+;
+	lda     #$45
+	sta     $2007
+;
+; PPU_ADDRESS = NAMETABLE0_HIGH + 0x06; //05
+;
+	lda     #$26
+	sta     $2006
+;
+; PPU_ADDRESS = NAMETABLE0_LOW  + 0xa6;
+;
+	lda     #$A6
+	sta     $2006
+;
+; PPU_DATA    = 'P';
+;
+	lda     #$50
+	sta     $2007
+;
+; PPU_DATA    = 'r';
+;
+	lda     #$72
+	sta     $2007
+;
+; PPU_DATA    = 'e';
+;
+	lda     #$65
+	sta     $2007
+;
+; PPU_DATA    = 's';
+;
+	lda     #$73
+	sta     $2007
+;
+; PPU_DATA    = 's';
+;
+	sta     $2007
+;
+; PPU_DATA    = ' ';
+;
+	lda     #$20
+	sta     $2007
+;
+; PPU_DATA    = 'S';
+;
+	lda     #$53
+	sta     $2007
+;
+; PPU_DATA    = 't';
+;
+	lda     #$74
+	sta     $2007
+;
+; PPU_DATA    = 'a';
+;
+	lda     #$61
+	sta     $2007
+;
+; PPU_DATA    = 'r';
+;
+	lda     #$72
+	sta     $2007
+;
+; PPU_DATA    = 't';
+;
+	lda     #$74
+	sta     $2007
+;
+; PPU_DATA    = ' ';
+;
+	lda     #$20
+	sta     $2007
+;
+; PPU_DATA    = 't';
+;
+	lda     #$74
+	sta     $2007
+;
+; PPU_DATA    = 'o';
+;
+	lda     #$6F
+	sta     $2007
+;
+; PPU_DATA    = ' ';
+;
+	lda     #$20
+	sta     $2007
+;
+; PPU_DATA    = 'P';
+;
+	lda     #$50
+	sta     $2007
+;
+; PPU_DATA    = 'l';
+;
+	lda     #$6C
+	sta     $2007
+;
+; PPU_DATA    = 'a';
+;
+	lda     #$61
+	sta     $2007
+;
+; PPU_DATA    = 'y';
+;
+	lda     #$79
+	sta     $2007
+;
+; PPU_DATA    = ' ';
+;
+	lda     #$20
+	sta     $2007
+;
+; reset_scroll();
+;
+	jmp     _reset_scroll
 
 .endproc
 
@@ -9066,9 +9250,8 @@ L1CC9:	rts
 	lda     #$00
 	sta     _level_status
 ;
-; game_state = Level_Intro;
+; game_state = Title;
 ;
-	lda     #$04
 	sta     _game_state
 ;
 ; start_x = 112;
@@ -9105,13 +9288,13 @@ L1CC9:	rts
 ;
 	jsr     _screen_off
 ;
-; level_intro();
-;
-	jsr     _level_intro
-;
 ; set_palette();
 ;
 	jsr     _set_palette
+;
+; draw_title();
+;
+	jsr     _draw_title
 ;
 ; screen_on();
 ;
@@ -9119,19 +9302,65 @@ L1CC9:	rts
 ;
 ; WaitFrame(); // wait for vblank/nmi handler in reset.s to trigger
 ;
-L19B3:	jsr     _WaitFrame
+L19AD:	jsr     _WaitFrame
+;
+; if (game_state == Title) {
+;
+	lda     _game_state
+	bne     L1DFE
+;
+; if (InputPort1 & BUTTON_START) {
+;
+	lda     _InputPort1
+	and     #$10
+	beq     L1DFD
+;
+; timer = 0;
+;
+	lda     #$00
+	sta     _timer
+;
+; game_state = Level_Intro;
+;
+	lda     #$04
+	sta     _game_state
+;
+; screen_off();
+;
+	jsr     _screen_off
+;
+; clear_nametable();
+;
+	jsr     _clear_nametable
+;
+; Wait_Vblank();
+;
+	jsr     _Wait_Vblank
+;
+; screen_on();
+;
+	jsr     _screen_on
+;
+; level_intro();
+;
+	jsr     _level_intro
+;
+; Frame_Number = 0;
+;
+	lda     #$00
+L1DFD:	sta     _Frame_Number
 ;
 ; if (game_state == Level_Intro) {
 ;
-	lda     _game_state
+L1DFE:	lda     _game_state
 	cmp     #$04
-	bne     L1D77
+	bne     L1DFF
 ;
 ; if (Frame_Number == 60) { // this runs once every second
 ;
 	lda     _Frame_Number
 	cmp     #$3C
-	bne     L1D77
+	bne     L1DFF
 ;
 ; ++timer;
 ;
@@ -9141,7 +9370,7 @@ L19B3:	jsr     _WaitFrame
 ;
 	lda     _timer
 	cmp     #$03
-	bcc     L19BD
+	bcc     L19C6
 ;
 ; timer = 0;
 ;
@@ -9191,7 +9420,7 @@ L19B3:	jsr     _WaitFrame
 ;
 ; update_time();
 ;
-L19BD:	jsr     _update_time
+L19C6:	jsr     _update_time
 ;
 ; Frame_Number = 0;
 ;
@@ -9200,9 +9429,9 @@ L19BD:	jsr     _update_time
 ;
 ; if (game_state == Level) {
 ;
-L1D77:	lda     _game_state
+L1DFF:	lda     _game_state
 	cmp     #$01
-	bne     L1D7E
+	bne     L1E06
 ;
 ; input_handler();
 ;
@@ -9220,17 +9449,17 @@ L1D77:	lda     _game_state
 	sbc     _end_x_max
 	sta     tmp1
 	lda     tmp1
-	beq     L1D78
-	bcs     L1D7D
-L1D78:	lda     _player_tl+3
+	beq     L1E00
+	bcs     L1E05
+L1E00:	lda     _player_tl+3
 	clc
 	adc     #$08
-	bcc     L19D7
+	bcc     L19E0
 	inx
-L19D7:	cmp     _end_x_min
+L19E0:	cmp     _end_x_min
 	txa
 	sbc     #$00
-	bcc     L1D7D
+	bcc     L1E05
 ;
 ; player_tl.y <= end_y_max && player_tl.y + PLAYER_HEIGHT >= end_y_min &&
 ;
@@ -9240,26 +9469,26 @@ L19D7:	cmp     _end_x_min
 	sbc     _end_y_max
 	sta     tmp1
 	lda     tmp1
-	beq     L1D79
-	bcs     L1D7D
-L1D79:	lda     _player_tl
+	beq     L1E01
+	bcs     L1E05
+L1E01:	lda     _player_tl
 	clc
 	adc     #$10
-	bcc     L19D8
+	bcc     L19E1
 	inx
-L19D8:	cmp     _end_y_min
+L19E1:	cmp     _end_y_min
 	txa
 	sbc     #$00
-	bcc     L1D7D
+	bcc     L1E05
 ;
 ; BUTTON_A & InputPort1 && level_switch == level_target)) {
 ;
 	lda     _InputPort1
 	and     #$80
-	beq     L1D7D
+	beq     L1E05
 	lda     _level_target
 	cmp     _level_switch
-	bne     L1D7D
+	bne     L1E05
 ;
 ; game_state = Level_Passed;
 ;
@@ -9268,10 +9497,10 @@ L19D8:	cmp     _end_y_min
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1D7E
-L1D7D:	lda     _level_status
+	jmp     L1E06
+L1E05:	lda     _level_status
 	cmp     #$03
-	bne     L1D7E
+	bne     L1E06
 ;
 ; level4_tele_logic();
 ;
@@ -9279,9 +9508,9 @@ L1D7D:	lda     _level_status
 ;
 ; if (game_state == Level_Passed) {
 ;
-L1D7E:	lda     _game_state
+L1E06:	lda     _game_state
 	cmp     #$02
-	jne     L1D82
+	jne     L1E0A
 ;
 ; player_state = Celebrate;
 ;
@@ -9305,7 +9534,7 @@ L1D7E:	lda     _game_state
 ;
 	lda     _level_status
 	cmp     #$01
-	bne     L1D7F
+	bne     L1E07
 ;
 ; game_state = End;
 ;
@@ -9335,10 +9564,10 @@ L1D7E:	lda     _game_state
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1D76
-L1D7F:	lda     _level_status
+	jmp     L1DFB
+L1E07:	lda     _level_status
 	cmp     #$02
-	bne     L1D80
+	bne     L1E08
 ;
 ; start_x = 50;
 ;
@@ -9363,10 +9592,10 @@ L1D7F:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1D76
-L1D80:	lda     _level_status
+	jmp     L1DFB
+L1E08:	lda     _level_status
 	cmp     #$03
-	bne     L1D81
+	bne     L1E09
 ;
 ; start_x = 48;
 ;
@@ -9405,10 +9634,10 @@ L1D80:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1A19
-L1D81:	lda     _level_status
+	jmp     L1A22
+L1E09:	lda     _level_status
 	cmp     #$04
-	bne     L1A19
+	bne     L1A22
 ;
 ; start_x = 24;
 ;
@@ -9438,11 +9667,11 @@ L1D81:	lda     _level_status
 ; end_y_max = 120;
 ;
 	lda     #$78
-L1D76:	sta     _end_y_max
+L1DFB:	sta     _end_y_max
 ;
 ; screen_off();
 ;
-L1A19:	jsr     _screen_off
+L1A22:	jsr     _screen_off
 ;
 ; clear_nametable();
 ;
@@ -9466,9 +9695,9 @@ L1A19:	jsr     _screen_off
 ;
 ; if (game_state == End) {
 ;
-L1D82:	lda     _game_state
+L1E0A:	lda     _game_state
 	cmp     #$03
-	bne     L1D83
+	bne     L1E0B
 ;
 ; input_handler();
 ;
@@ -9481,7 +9710,7 @@ L1D82:	lda     _game_state
 ; if (end_drawn == 0) {
 ;
 	lda     _end_drawn
-	bne     L1D83
+	bne     L1E0B
 ;
 ; draw_end();
 ;
@@ -9507,12 +9736,12 @@ L1D82:	lda     _game_state
 ;
 ; if (game_state != End && Frame_Number == 60) {
 ;
-L1D83:	lda     _game_state
+L1E0B:	lda     _game_state
 	cmp     #$03
-	jeq     L19B3
+	jeq     L19AD
 	lda     _Frame_Number
 	cmp     #$3C
-	jne     L19B3
+	jne     L19AD
 ;
 ; add_second();
 ;
@@ -9529,7 +9758,7 @@ L1D83:	lda     _game_state
 ;
 ; while(1) {
 ;
-	jmp     L19B3
+	jmp     L19AD
 
 .endproc
 
