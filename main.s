@@ -7061,12 +7061,12 @@ _end_y_max:
 ;
 	sta     _i
 	sta     _i+1
-L1B76:	lda     _i+1
+L1B8A:	lda     _i+1
 	cmp     #$00
-	bne     L1B7E
+	bne     L1B92
 	lda     _i
 	cmp     #$20
-L1B7E:	bcs     L1B77
+L1B92:	bcs     L1B8B
 ;
 ; PPU_DATA = PALETTE[i];
 ;
@@ -7083,13 +7083,13 @@ L1B7E:	bcs     L1B77
 ; for (i = 0; i < sizeof(PALETTE); ++i) // always use ++i, instead of i++
 ;
 	inc     _i
-	bne     L1B76
+	bne     L1B8A
 	inc     _i+1
-	jmp     L1B76
+	jmp     L1B8A
 ;
 ; reset_scroll();
 ;
-L1B77:	jmp     _reset_scroll
+L1B8B:	jmp     _reset_scroll
 
 .endproc
 
@@ -7404,7 +7404,7 @@ L1B77:	jmp     _reset_scroll
 ;
 	lda     _InputPort1
 	and     #$08
-	beq     L1FC0
+	beq     L1FEC
 ;
 ; --player_tr.y;
 ;
@@ -7429,9 +7429,9 @@ L1B77:	jmp     _reset_scroll
 ;
 ; if (InputPort1 & BUTTON_DOWN) {
 ;
-L1FC0:	lda     _InputPort1
+L1FEC:	lda     _InputPort1
 	and     #$04
-	beq     L1BF8
+	beq     L1C0C
 ;
 ; ++player_tr.y;
 ;
@@ -7456,13 +7456,13 @@ L1FC0:	lda     _InputPort1
 ;
 ; collision_check_vert();
 ;
-L1BF8:	jsr     _collision_check_vert
+L1C0C:	jsr     _collision_check_vert
 ;
 ; if (InputPort1 & BUTTON_LEFT) {
 ;
 	lda     _InputPort1
 	and     #$02
-	beq     L1FC1
+	beq     L1FED
 ;
 ; --player_tl.x;
 ;
@@ -7487,9 +7487,9 @@ L1BF8:	jsr     _collision_check_vert
 ;
 ; if (InputPort1 & BUTTON_RIGHT) {
 ;
-L1FC1:	lda     _InputPort1
+L1FED:	lda     _InputPort1
 	and     #$01
-	beq     L1C09
+	beq     L1C1D
 ;
 ; ++player_tl.x;
 ;
@@ -7514,7 +7514,7 @@ L1FC1:	lda     _InputPort1
 ;
 ; collision_check_horiz();
 ;
-L1C09:	jmp     _collision_check_horiz
+L1C1D:	jmp     _collision_check_horiz
 
 .endproc
 
@@ -7533,12 +7533,12 @@ L1C09:	jmp     _collision_check_horiz
 ;
 	lda     _game_state
 	cmp     #$03
-	beq     L1FC7
+	beq     L1FF3
 ;
 ; if (player_state == Going_Up) {
 ;
 	lda     _player_state
-	bne     L1FC3
+	bne     L1FEF
 ;
 ; player_tl.tile_index = 0x86;
 ;
@@ -7561,10 +7561,10 @@ L1C09:	jmp     _collision_check_horiz
 ;
 ; } else if (player_state == Going_Down) {
 ;
-	jmp     L1FC2
-L1FC3:	lda     _player_state
+	jmp     L1FEE
+L1FEF:	lda     _player_state
 	cmp     #$01
-	bne     L1FC4
+	bne     L1FF0
 ;
 ; player_tl.tile_index = 0x84;
 ;
@@ -7587,10 +7587,10 @@ L1FC3:	lda     _player_state
 ;
 ; } else if (player_state == Going_Left) {
 ;
-	jmp     L1FC2
-L1FC4:	lda     _player_state
+	jmp     L1FEE
+L1FF0:	lda     _player_state
 	cmp     #$02
-	bne     L1FC5
+	bne     L1FF1
 ;
 ; player_tl.tile_index = 0x80;
 ;
@@ -7613,10 +7613,10 @@ L1FC4:	lda     _player_state
 ;
 ; } else if (player_state == Going_Right) {
 ;
-	jmp     L1FC2
-L1FC5:	lda     _player_state
+	jmp     L1FEE
+L1FF1:	lda     _player_state
 	cmp     #$03
-	bne     L1FC6
+	bne     L1FF2
 ;
 ; player_tl.tile_index = 0x82;
 ;
@@ -7639,14 +7639,14 @@ L1FC5:	lda     _player_state
 ;
 ; } else if (player_state == Celebrate) {
 ;
-	jmp     L1FC2
-L1FC6:	lda     _player_state
+	jmp     L1FEE
+L1FF2:	lda     _player_state
 	cmp     #$04
-	bne     L1C4B
+	bne     L1C5F
 ;
 ; player_tl.tile_index = 0x88;
 ;
-L1FC7:	lda     #$88
+L1FF3:	lda     #$88
 	sta     _player_tl+1
 ;
 ; player_tr.tile_index = 0x89;
@@ -7662,11 +7662,11 @@ L1FC7:	lda     #$88
 ; player_br.tile_index = 0x99;  
 ;
 	lda     #$99
-L1FC2:	sta     _player_br+1
+L1FEE:	sta     _player_br+1
 ;
 ; }
 ;
-L1C4B:	rts
+L1C5F:	rts
 
 .endproc
 
@@ -7685,7 +7685,7 @@ L1C4B:	rts
 ;
 	lda     _time_sec_low
 	cmp     #$09
-	bcs     L1FCE
+	bcs     L1FFA
 ;
 ; ++time_sec_low;
 ;
@@ -7694,9 +7694,9 @@ L1C4B:	rts
 ; else if (time_sec_low == 9) {
 ;
 	rts
-L1FCE:	lda     _time_sec_low
+L1FFA:	lda     _time_sec_low
 	cmp     #$09
-	bne     L1C68
+	bne     L1C7C
 ;
 ; time_sec_low = 0;
 ;
@@ -7707,7 +7707,7 @@ L1FCE:	lda     _time_sec_low
 ;
 	lda     _time_sec_high
 	cmp     #$05
-	bcs     L1FCF
+	bcs     L1FFB
 ;
 ; ++time_sec_high;
 ;
@@ -7716,9 +7716,9 @@ L1FCE:	lda     _time_sec_low
 ; else if (time_sec_high == 5) {
 ;
 	rts
-L1FCF:	lda     _time_sec_high
+L1FFB:	lda     _time_sec_high
 	cmp     #$05
-	bne     L1C68
+	bne     L1C7C
 ;
 ; time_sec_high = 0;
 ;
@@ -7729,7 +7729,7 @@ L1FCF:	lda     _time_sec_high
 ;
 	lda     _time_min
 	cmp     #$09
-	bcs     L1FD0
+	bcs     L1FFC
 ;
 ; ++time_min;
 ;
@@ -7741,7 +7741,7 @@ L1FCF:	lda     _time_sec_high
 ;
 ; time_min = 0;
 ;
-L1FD0:	lda     #$00
+L1FFC:	lda     #$00
 	sta     _time_min
 ;
 ; time_sec_high = 0;
@@ -7754,7 +7754,7 @@ L1FD0:	lda     #$00
 ;
 ; }
 ;
-L1C68:	rts
+L1C7C:	rts
 
 .endproc
 
@@ -7782,7 +7782,7 @@ L1C68:	rts
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1FD2
+	bne     L1FFE
 ;
 ; UnRLE(level1);
 ;
@@ -7791,10 +7791,10 @@ L1C68:	rts
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L1FD1
-L1FD2:	lda     _level_status
+	jmp     L1FFD
+L1FFE:	lda     _level_status
 	cmp     #$01
-	bne     L1FD3
+	bne     L1FFF
 ;
 ; UnRLE(level2);
 ;
@@ -7803,10 +7803,10 @@ L1FD2:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1FD1
-L1FD3:	lda     _level_status
+	jmp     L1FFD
+L1FFF:	lda     _level_status
 	cmp     #$02
-	bne     L1FD4
+	bne     L2000
 ;
 ; UnRLE(level3);
 ;
@@ -7815,10 +7815,10 @@ L1FD3:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1FD1
-L1FD4:	lda     _level_status
+	jmp     L1FFD
+L2000:	lda     _level_status
 	cmp     #$03
-	bne     L1FD5
+	bne     L2001
 ;
 ; UnRLE(level4);
 ;
@@ -7827,20 +7827,20 @@ L1FD4:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1FD1
-L1FD5:	lda     _level_status
+	jmp     L1FFD
+L2001:	lda     _level_status
 	cmp     #$04
-	bne     L1C8A
+	bne     L1C9E
 ;
 ; UnRLE(level5);
 ;
 	lda     #<(_level5)
 	ldx     #>(_level5)
-L1FD1:	jsr     _UnRLE
+L1FFD:	jsr     _UnRLE
 ;
 ; reset_scroll();
 ;
-L1C8A:	jmp     _reset_scroll
+L1C9E:	jmp     _reset_scroll
 
 .endproc
 
@@ -7889,9 +7889,9 @@ L1C8A:	jmp     _reset_scroll
 	lda     _player_left_side
 	clc
 	adc     _player_right_side
-	bcc     L1FD6
+	bcc     L2002
 	inx
-L1FD6:	jsr     shrax1
+L2002:	jsr     shrax1
 	sta     _player_center_x
 ;
 ; player_center_y   = (player_top + player_bottom) >> 1;
@@ -7900,9 +7900,9 @@ L1FD6:	jsr     shrax1
 	lda     _player_top
 	clc
 	adc     _player_bottom
-	bcc     L1FD7
+	bcc     L2003
 	inx
-L1FD7:	jsr     shrax1
+L2003:	jsr     shrax1
 	sta     _player_center_y
 ;
 ; }
@@ -7930,7 +7930,7 @@ L1FD7:	jsr     shrax1
 ;
 	lda     _InputPort1
 	and     #$08
-	jeq     L1FE9
+	jeq     L2015
 ;
 ; collision_row = player_top >> 3;
 ;
@@ -7951,7 +7951,7 @@ L1FD7:	jsr     shrax1
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1FE4
+	bne     L2010
 ;
 ; blocked = c_map1[collision_row][collision_col];
 ;
@@ -7969,10 +7969,10 @@ L1FD7:	jsr     shrax1
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L1FF5
-L1FE4:	lda     _level_status
+	jmp     L2021
+L2010:	lda     _level_status
 	cmp     #$01
-	bne     L1FE5
+	bne     L2011
 ;
 ; blocked = c_map2[collision_row][collision_col];
 ;
@@ -7990,10 +7990,10 @@ L1FE4:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1FF5
-L1FE5:	lda     _level_status
+	jmp     L2021
+L2011:	lda     _level_status
 	cmp     #$02
-	bne     L1FE6
+	bne     L2012
 ;
 ; blocked = c_map3[collision_row][collision_col];
 ;
@@ -8011,10 +8011,10 @@ L1FE5:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1FF5
-L1FE6:	lda     _level_status
+	jmp     L2021
+L2012:	lda     _level_status
 	cmp     #$03
-	bne     L1FE7
+	bne     L2013
 ;
 ; blocked = c_map4[collision_row][collision_col];
 ;
@@ -8032,10 +8032,10 @@ L1FE6:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1FF5
-L1FE7:	lda     _level_status
+	jmp     L2021
+L2013:	lda     _level_status
 	cmp     #$04
-	bne     L1FE8
+	bne     L2014
 ;
 ; blocked = c_map5[collision_row][collision_col];
 ;
@@ -8050,15 +8050,15 @@ L1FE7:	lda     _level_status
 	sta     ptr1
 	lda     tmp1
 	adc     #>(_c_map5)
-L1FF5:	sta     ptr1+1
+L2021:	sta     ptr1+1
 	ldy     _collision_col
 	lda     (ptr1),y
 	sta     _blocked
 ;
 ; if (blocked != 0) {
 ;
-L1FE8:	lda     _blocked
-	beq     L1FE9
+L2014:	lda     _blocked
+	beq     L2015
 ;
 ; ++player_tl.y;
 ;
@@ -8078,9 +8078,9 @@ L1FE8:	lda     _blocked
 ;
 ; if (InputPort1 & BUTTON_DOWN) {
 ;
-L1FE9:	lda     _InputPort1
+L2015:	lda     _InputPort1
 	and     #$04
-	bne     L1FF7
+	bne     L2023
 ;
 ; }
 ;
@@ -8088,7 +8088,7 @@ L1FE9:	lda     _InputPort1
 ;
 ; collision_row = player_bottom >> 3;
 ;
-L1FF7:	lda     _player_bottom
+L2023:	lda     _player_bottom
 	lsr     a
 	lsr     a
 	lsr     a
@@ -8105,7 +8105,7 @@ L1FF7:	lda     _player_bottom
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1FEA
+	bne     L2016
 ;
 ; blocked = c_map1[collision_row][collision_col];
 ;
@@ -8123,10 +8123,10 @@ L1FF7:	lda     _player_bottom
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L1FF6
-L1FEA:	lda     _level_status
+	jmp     L2022
+L2016:	lda     _level_status
 	cmp     #$01
-	bne     L1FEB
+	bne     L2017
 ;
 ; blocked = c_map2[collision_row][collision_col];
 ;
@@ -8144,10 +8144,10 @@ L1FEA:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L1FF6
-L1FEB:	lda     _level_status
+	jmp     L2022
+L2017:	lda     _level_status
 	cmp     #$02
-	bne     L1FEC
+	bne     L2018
 ;
 ; blocked = c_map3[collision_row][collision_col];
 ;
@@ -8165,10 +8165,10 @@ L1FEB:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L1FF6
-L1FEC:	lda     _level_status
+	jmp     L2022
+L2018:	lda     _level_status
 	cmp     #$03
-	bne     L1FED
+	bne     L2019
 ;
 ; blocked = c_map4[collision_row][collision_col];
 ;
@@ -8186,10 +8186,10 @@ L1FEC:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L1FF6
-L1FED:	lda     _level_status
+	jmp     L2022
+L2019:	lda     _level_status
 	cmp     #$04
-	bne     L1FEE
+	bne     L201A
 ;
 ; blocked = c_map5[collision_row][collision_col];
 ;
@@ -8204,15 +8204,15 @@ L1FED:	lda     _level_status
 	sta     ptr1
 	lda     tmp1
 	adc     #>(_c_map5)
-L1FF6:	sta     ptr1+1
+L2022:	sta     ptr1+1
 	ldy     _collision_col
 	lda     (ptr1),y
 	sta     _blocked
 ;
 ; if (blocked != 0) {
 ;
-L1FEE:	lda     _blocked
-	beq     L1DB7
+L201A:	lda     _blocked
+	beq     L1DCB
 ;
 ; --player_tl.y;
 ;
@@ -8232,7 +8232,7 @@ L1FEE:	lda     _blocked
 ;
 ; }
 ;
-L1DB7:	rts
+L1DCB:	rts
 
 .endproc
 
@@ -8268,7 +8268,7 @@ L1DB7:	rts
 ;
 	lda     _InputPort1
 	and     #$01
-	jeq     L201B
+	jeq     L2047
 ;
 ; collision_row = player_center_y >> 3;
 ;
@@ -8289,7 +8289,7 @@ L1DB7:	rts
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L2014
+	bne     L2040
 ;
 ; blocked = c_map1[collision_row][collision_col];
 ;
@@ -8349,10 +8349,10 @@ L1DB7:	rts
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L2028
-L2014:	lda     _level_status
+	jmp     L2054
+L2040:	lda     _level_status
 	cmp     #$01
-	bne     L2015
+	bne     L2041
 ;
 ; blocked = c_map2[collision_row][collision_col];
 ;
@@ -8379,10 +8379,10 @@ L2014:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L2012
-L2015:	lda     _level_status
+	jmp     L203E
+L2041:	lda     _level_status
 	cmp     #$02
-	bne     L2016
+	bne     L2042
 ;
 ; blocked = c_map3[collision_row][collision_col];
 ;
@@ -8442,10 +8442,10 @@ L2015:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L2028
-L2016:	lda     _level_status
+	jmp     L2054
+L2042:	lda     _level_status
 	cmp     #$03
-	bne     L2017
+	bne     L2043
 ;
 ; blocked = c_map4[collision_row][collision_col];
 ;
@@ -8505,10 +8505,10 @@ L2016:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L2028
-L2017:	lda     _level_status
+	jmp     L2054
+L2043:	lda     _level_status
 	cmp     #$04
-	bne     L2018
+	bne     L2044
 ;
 ; blocked = c_map5[collision_row][collision_col];
 ;
@@ -8565,23 +8565,23 @@ L2017:	lda     _level_status
 	sta     ptr1
 	lda     tmp1
 	adc     #>(_c_map5)
-L2028:	sta     ptr1+1
+L2054:	sta     ptr1+1
 	ldy     _collision_col
 	lda     (ptr1),y
-L2012:	sta     _blocked_bot
+L203E:	sta     _blocked_bot
 ;
 ; if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 ;
-L2018:	lda     _blocked
-	bne     L2019
+L2044:	lda     _blocked
+	bne     L2045
 	lda     _blocked_top
-	bne     L2019
+	bne     L2045
 	lda     _blocked_bot
-	beq     L201B
+	beq     L2047
 ;
 ; --player_tl.x;
 ;
-L2019:	dec     _player_tl+3
+L2045:	dec     _player_tl+3
 ;
 ; --player_bl.x;
 ;
@@ -8598,7 +8598,7 @@ L2019:	dec     _player_tl+3
 ; blocked = 0;
 ;
 	lda     #$00
-L201B:	sta     _blocked
+L2047:	sta     _blocked
 ;
 ; blocked_top = 0;
 ;
@@ -8612,7 +8612,7 @@ L201B:	sta     _blocked
 ;
 	lda     _InputPort1
 	and     #$02
-	bne     L202A
+	bne     L2056
 ;
 ; }
 ;
@@ -8620,7 +8620,7 @@ L201B:	sta     _blocked
 ;
 ; collision_row = player_center_y >> 3;
 ;
-L202A:	lda     _player_center_y
+L2056:	lda     _player_center_y
 	lsr     a
 	lsr     a
 	lsr     a
@@ -8637,7 +8637,7 @@ L202A:	lda     _player_center_y
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L201C
+	bne     L2048
 ;
 ; blocked = c_map1[collision_row][collision_col];
 ;
@@ -8697,10 +8697,10 @@ L202A:	lda     _player_center_y
 ;
 ; } else if (level_status == 1) {
 ;
-	jmp     L2029
-L201C:	lda     _level_status
+	jmp     L2055
+L2048:	lda     _level_status
 	cmp     #$01
-	bne     L201D
+	bne     L2049
 ;
 ; blocked = c_map2[collision_row][collision_col];
 ;
@@ -8731,10 +8731,10 @@ L201C:	lda     _level_status
 ;
 ; } else if (level_status == 2) {
 ;
-	jmp     L2013
-L201D:	lda     _level_status
+	jmp     L203F
+L2049:	lda     _level_status
 	cmp     #$02
-	bne     L201E
+	bne     L204A
 ;
 ; blocked = c_map3[collision_row][collision_col];
 ;
@@ -8794,10 +8794,10 @@ L201D:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L2029
-L201E:	lda     _level_status
+	jmp     L2055
+L204A:	lda     _level_status
 	cmp     #$03
-	bne     L201F
+	bne     L204B
 ;
 ; blocked = c_map4[collision_row][collision_col];
 ;
@@ -8857,10 +8857,10 @@ L201E:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L2029
-L201F:	lda     _level_status
+	jmp     L2055
+L204B:	lda     _level_status
 	cmp     #$04
-	bne     L2020
+	bne     L204C
 ;
 ; blocked = c_map5[collision_row][collision_col];
 ;
@@ -8917,24 +8917,24 @@ L201F:	lda     _level_status
 	sta     ptr1
 	lda     tmp1
 	adc     #>(_c_map5)
-L2029:	sta     ptr1+1
+L2055:	sta     ptr1+1
 	ldy     _collision_col
 	lda     (ptr1),y
-L2013:	sta     _blocked_bot
+L203F:	sta     _blocked_bot
 ;
 ; if (blocked != 0 || blocked_top != 0 || blocked_bot != 0) {
 ;
-L2020:	lda     _blocked
-	bne     L2021
+L204C:	lda     _blocked
+	bne     L204D
 	lda     _blocked_top
-	bne     L2021
+	bne     L204D
 	lda     _blocked_bot
-	bne     L2021
+	bne     L204D
 	rts
 ;
 ; ++player_tl.x;
 ;
-L2021:	inc     _player_tl+3
+L204D:	inc     _player_tl+3
 ;
 ; ++player_bl.x;
 ;
@@ -9041,7 +9041,7 @@ L2021:	inc     _player_tl+3
 ; if (level_status == 0) {
 ;
 	lda     _level_status
-	bne     L1DDE
+	bne     L1DF2
 ;
 ; reset_scroll();
 ;
@@ -9052,9 +9052,9 @@ L2021:	inc     _player_tl+3
 	lda     #$22
 	sta     $2006
 ;
-; PPU_ADDRESS = NAMETABLE0_LOW  + 0xa8;
+; PPU_ADDRESS = NAMETABLE0_LOW  + 0xa5;
 ;
-	lda     #$A8
+	lda     #$A5
 	sta     $2006
 ;
 ; PPU_DATA = 'P';
@@ -9136,9 +9136,38 @@ L2021:	inc     _player_tl+3
 	lda     #$72
 	sta     $2007
 ;
+; PPU_DATA = ' ';
+;
+	lda     #$20
+	sta     $2007
+;
+; PPU_DATA = 'D';
+;
+	lda     #$44
+	sta     $2007
+;
+; PPU_DATA = 'o';
+;
+	lda     #$6F
+	sta     $2007
+;
+; PPU_DATA = 'o';
+;
+	sta     $2007
+;
+; PPU_DATA = 'r';
+;
+	lda     #$72
+	sta     $2007
+;
+; PPU_DATA = 's';
+;
+	lda     #$73
+	sta     $2007
+;
 ; reset_scroll();
 ;
-L1DDE:	jmp     _reset_scroll
+L1DF2:	jmp     _reset_scroll
 
 .endproc
 
@@ -9157,7 +9186,7 @@ L1DDE:	jmp     _reset_scroll
 ;
 	lda     _InputPort1
 	and     #$80
-	bne     L2036
+	bne     L2062
 ;
 ; }
 ;
@@ -9165,30 +9194,30 @@ L1DDE:	jmp     _reset_scroll
 ;
 ; if (player_tl.x >= 184 - PLAYER_WIDTH && player_tl.x <= 184 + PLAYER_WIDTH &&
 ;
-L2036:	lda     _player_tl+3
+L2062:	lda     _player_tl+3
 	cmp     #$B0
-	bcc     L2030
+	bcc     L205C
 	cmp     #$C1
-	bcs     L2030
+	bcs     L205C
 ;
 ; player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$38
-	bcc     L2030
+	bcc     L205C
 	cmp     #$59
-	bcs     L2030
+	bcs     L205C
 ;
 ; if (level_switch == 0 || level_switch == 2) {
 ;
 	lda     _level_switch
-	beq     L202E
+	beq     L205A
 	cmp     #$02
-	bne     L202F
+	bne     L205B
 ;
 ; start_x = 48;
 ;
-L202E:	lda     #$30
+L205A:	lda     #$30
 	sta     _start_x
 ;
 ; start_y = 88;
@@ -9207,10 +9236,10 @@ L202E:	lda     #$30
 ;
 ; } else if (level_switch == 1) {
 ;
-	jmp     L2030
-L202F:	lda     _level_switch
+	jmp     L205C
+L205B:	lda     _level_switch
 	cmp     #$01
-	bne     L2030
+	bne     L205C
 ;
 ; game_state == Level_Passed;
 ;
@@ -9218,27 +9247,31 @@ L202F:	lda     _level_switch
 	cmp     #$02
 	jsr     booleq
 ;
+; level_switch = 0;
+;
+	stx     _level_switch
+;
 ; if (player_tl.x >= 184 - PLAYER_WIDTH && player_tl.x <= 184 + PLAYER_WIDTH &&
 ;
-L2030:	lda     _player_tl+3
+L205C:	lda     _player_tl+3
 	cmp     #$B0
-	bcc     L2032
+	bcc     L205E
 	cmp     #$C1
-	bcs     L2032
+	bcs     L205E
 ;
 ; player_tl.y >= 104 - PLAYER_HEIGHT && player_tl.y <= 104 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$58
-	bcc     L2032
+	bcc     L205E
 	cmp     #$79
-	bcc     L2033
-L2032:	rts
+	bcc     L205F
+L205E:	rts
 ;
 ; if (level_switch == 0) {
 ;
-L2033:	lda     _level_switch
-	bne     L2034
+L205F:	lda     _level_switch
+	bne     L2060
 ;
 ; start_x = 48;
 ;
@@ -9261,9 +9294,9 @@ L2033:	lda     _level_switch
 ;
 ; } else if (level_switch == 1) {
 ;
-L2034:	lda     _level_switch
+L2060:	lda     _level_switch
 	cmp     #$01
-	bne     L2035
+	bne     L2061
 ;
 ; start_x = 48;
 ;
@@ -9286,17 +9319,22 @@ L2034:	lda     _level_switch
 ;
 ; } else if (level_switch == 2) {
 ;
-L2035:	lda     _level_switch
+L2061:	lda     _level_switch
 	cmp     #$02
-	bne     L1E4F
+	bne     L1E77
 ;
 ; game_state = Level_Passed;
 ;
 	sta     _game_state
 ;
+; level_switch = 0;
+;
+	lda     #$00
+	sta     _level_switch
+;
 ; }
 ;
-L1E4F:	rts
+L1E77:	rts
 
 .endproc
 
@@ -9315,7 +9353,7 @@ L1E4F:	rts
 ;
 	lda     _InputPort1
 	and     #$80
-	bne     L2044
+	bne     L2070
 ;
 ; }
 ;
@@ -9323,30 +9361,30 @@ L1E4F:	rts
 ;
 ; if (player_tl.x >= 184 - PLAYER_WIDTH && player_tl.x <= 184 + PLAYER_WIDTH &&
 ;
-L2044:	lda     _player_tl+3
+L2070:	lda     _player_tl+3
 	cmp     #$B0
-	bcc     L203C
+	bcc     L2068
 	cmp     #$C1
-	bcs     L203C
+	bcs     L2068
 ;
 ; player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$38
-	bcc     L203C
+	bcc     L2068
 	cmp     #$59
-	bcs     L203C
+	bcs     L2068
 ;
 ; if (level_switch == 0 || level_switch == 2) {
 ;
 	lda     _level_switch
-	beq     L203A
+	beq     L2066
 	cmp     #$02
-	bne     L203B
+	bne     L2067
 ;
 ; start_x = 48;
 ;
-L203A:	lda     #$30
+L2066:	lda     #$30
 	sta     _start_x
 ;
 ; start_y = 88;
@@ -9365,10 +9403,10 @@ L203A:	lda     #$30
 ;
 ; } else if (level_switch == 1) {
 ;
-	jmp     L203C
-L203B:	lda     _level_switch
+	jmp     L2068
+L2067:	lda     _level_switch
 	cmp     #$01
-	bne     L203C
+	bne     L2068
 ;
 ; game_state == Level_Passed;
 ;
@@ -9378,31 +9416,31 @@ L203B:	lda     _level_switch
 ;
 ; if (player_tl.x >= 180 - PLAYER_WIDTH && player_tl.x <= 192 + PLAYER_WIDTH &&
 ;
-L203C:	lda     _player_tl+3
+L2068:	lda     _player_tl+3
 	cmp     #$AC
-	bcc     L203E
+	bcc     L206A
 	cmp     #$C9
-	bcs     L203E
+	bcs     L206A
 ;
 ; player_tl.y >= 104 - PLAYER_HEIGHT && player_tl.y <= 104 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$58
-	bcc     L203E
+	bcc     L206A
 	cmp     #$79
-	bcc     L203F
-L203E:	rts
+	bcc     L206B
+L206A:	rts
 ;
 ; if (level_switch == 0 || level_switch == 1) {
 ;
-L203F:	lda     _level_switch
-	beq     L2042
+L206B:	lda     _level_switch
+	beq     L206E
 	cmp     #$01
-	bne     L2043
+	bne     L206F
 ;
 ; start_x = 48;
 ;
-L2042:	lda     #$30
+L206E:	lda     #$30
 	sta     _start_x
 ;
 ; start_y = 88;
@@ -9421,9 +9459,9 @@ L2042:	lda     #$30
 ;
 ; } else if (level_switch == 2) {
 ;
-L2043:	lda     _level_switch
+L206F:	lda     _level_switch
 	cmp     #$02
-	bne     L1E77
+	bne     L1EA1
 ;
 ; game_state = Level_Passed;
 ;
@@ -9431,7 +9469,7 @@ L2043:	lda     _level_switch
 ;
 ; }
 ;
-L1E77:	rts
+L1EA1:	rts
 
 .endproc
 
@@ -9450,7 +9488,7 @@ L1E77:	rts
 ;
 	lda     _InputPort1
 	and     #$80
-	bne     L2076
+	bne     L20A4
 ;
 ; }
 ;
@@ -9458,24 +9496,24 @@ L1E77:	rts
 ;
 ; if (player_tl.x >= 64 - PLAYER_WIDTH && player_tl.x <= 64 + PLAYER_WIDTH &&
 ;
-L2076:	lda     _player_tl+3
+L20A4:	lda     _player_tl+3
 	cmp     #$38
-	bcc     L204C
+	bcc     L2079
 	cmp     #$49
-	bcs     L204C
+	bcs     L2079
 ;
 ; player_tl.y >= 40 - PLAYER_HEIGHT && player_tl.y <= 40 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$18
-	bcc     L204C
+	bcc     L2079
 	cmp     #$39
-	bcs     L204C
+	bcs     L2079
 ;
 ; if (level_switch == 0) {
 ;
 	lda     _level_switch
-	bne     L204C
+	bne     L2079
 ;
 ; start_x = 184; // send to top-right
 ;
@@ -9498,24 +9536,24 @@ L2076:	lda     _player_tl+3
 ;
 ; if (player_tl.x >= 24 - PLAYER_WIDTH && player_tl.x <= 24 + PLAYER_WIDTH &&
 ;
-L204C:	lda     _player_tl+3
+L2079:	lda     _player_tl+3
 	cmp     #$10
-	bcc     L2050
+	bcc     L207D
 	cmp     #$21
-	bcs     L2050
+	bcs     L207D
 ;
 ; player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$38
-	bcc     L2050
+	bcc     L207D
 	cmp     #$59
-	bcs     L2050
+	bcs     L207D
 ;
 ; if (level_switch == 0) {
 ;
 	lda     _level_switch
-	bne     L2050
+	bne     L207D
 ;
 ; start_x = 184; // send to top-right
 ;
@@ -9538,24 +9576,24 @@ L204C:	lda     _player_tl+3
 ;
 ; if (player_tl.x >= 64 - PLAYER_WIDTH && player_tl.x <= 64 + PLAYER_WIDTH &&
 ;
-L2050:	lda     _player_tl+3
+L207D:	lda     _player_tl+3
 	cmp     #$38
-	bcc     L2054
+	bcc     L2081
 	cmp     #$49
-	bcs     L2054
+	bcs     L2081
 ;
 ; player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$38
-	bcc     L2054
+	bcc     L2081
 	cmp     #$59
-	bcs     L2054
+	bcs     L2081
 ;
 ; if (level_switch == 0) {
 ;
 	lda     _level_switch
-	bne     L2054
+	bne     L2081
 ;
 ; start_x = 120; // send to bottom
 ;
@@ -9578,25 +9616,25 @@ L2050:	lda     _player_tl+3
 ;
 ; if (player_tl.x >= 120 && player_tl.x <= 120 + PLAYER_WIDTH &&
 ;
-L2054:	lda     _player_tl+3
+L2081:	lda     _player_tl+3
 	cmp     #$78
-	bcc     L2059
+	bcc     L2086
 	cmp     #$81
-	bcs     L2059
+	bcs     L2086
 ;
 ; player_tl.y >= 104 - PLAYER_HEIGHT && player_tl.y <= 104 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$58
-	bcc     L2059
+	bcc     L2086
 	cmp     #$79
-	bcs     L2059
+	bcs     L2086
 ;
 ; if (level_switch == 3) {
 ;
 	lda     _level_switch
 	cmp     #$03
-	bne     L2058
+	bne     L2085
 ;
 ; game_state = Level_Passed;
 ;
@@ -9605,11 +9643,11 @@ L2054:	lda     _player_tl+3
 ;
 ; } else {
 ;
-	jmp     L2059
+	jmp     L209A
 ;
 ; start_x = 24; // send top-left
 ;
-L2058:	lda     #$18
+L2085:	lda     #$18
 	sta     _start_x
 ;
 ; start_y = 40;
@@ -9623,29 +9661,29 @@ L2058:	lda     #$18
 ;
 ; level_switch = 0;
 ;
-	lda     #$00
+L209A:	lda     #$00
 	sta     _level_switch
 ;
 ; if (player_tl.x >= 224 - PLAYER_WIDTH && player_tl.x <= 224 + PLAYER_WIDTH &&
 ;
-L2059:	lda     _player_tl+3
+L2086:	lda     _player_tl+3
 	cmp     #$D8
-	bcc     L205E
+	bcc     L208B
 	cmp     #$E9
-	bcs     L205E
+	bcs     L208B
 ;
 ; player_tl.y >= 40 - PLAYER_HEIGHT && player_tl.y <= 40 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$18
-	bcc     L205E
+	bcc     L208B
 	cmp     #$39
-	bcs     L205E
+	bcs     L208B
 ;
 ; if (level_switch == 0) {
 ;
 	lda     _level_switch
-	bne     L205D
+	bne     L208A
 ;
 ; start_x = 112; // send to middle
 ;
@@ -9667,10 +9705,10 @@ L2059:	lda     _player_tl+3
 ;
 ; } else if (level_switch == 2) {
 ;
-	jmp     L2045
-L205D:	lda     _level_switch
+	jmp     L2072
+L208A:	lda     _level_switch
 	cmp     #$02
-	bne     L205E
+	bne     L208B
 ;
 ; start_x = 112; // send to middle
 ;
@@ -9689,29 +9727,29 @@ L205D:	lda     _level_switch
 ; level_switch = 3;
 ;
 	lda     #$03
-L2045:	sta     _level_switch
+L2072:	sta     _level_switch
 ;
 ; if (player_tl.x >= 224 - PLAYER_WIDTH && player_tl.x <= 224 + PLAYER_WIDTH &&
 ;
-L205E:	lda     _player_tl+3
+L208B:	lda     _player_tl+3
 	cmp     #$D8
-	bcc     L2063
+	bcc     L2090
 	cmp     #$E9
-	bcs     L2063
+	bcs     L2090
 ;
 ; player_tl.y >= 72 - PLAYER_HEIGHT && player_tl.y <= 72 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$38
-	bcc     L2063
+	bcc     L2090
 	cmp     #$59
-	bcs     L2063
+	bcs     L2090
 ;
 ; if (level_switch == 2) {
 ;
 	lda     _level_switch
 	cmp     #$02
-	bne     L2062
+	bne     L208F
 ;
 ; start_x = 112; // send to middle
 ;
@@ -9724,9 +9762,9 @@ L205E:	lda     _player_tl+3
 ;
 ; } else if (level_switch == 0) {
 ;
-	jmp     L2071
-L2062:	lda     _level_switch
-	bne     L2063
+	jmp     L209F
+L208F:	lda     _level_switch
+	bne     L2090
 ;
 ; start_x = 120; // send to bottom
 ;
@@ -9736,7 +9774,7 @@ L2062:	lda     _level_switch
 ; start_y = 152;
 ;
 	lda     #$98
-L2071:	sta     _start_y
+L209F:	sta     _start_y
 ;
 ; set_player();
 ;
@@ -9749,19 +9787,19 @@ L2071:	sta     _start_y
 ;
 ; if (player_tl.x >= 40 - PLAYER_WIDTH && player_tl.x <= 40 + PLAYER_WIDTH &&
 ;
-L2063:	lda     _player_tl+3
+L2090:	lda     _player_tl+3
 	cmp     #$20
-	bcc     L2068
+	bcc     L2095
 	cmp     #$31
-	bcs     L2068
+	bcs     L2095
 ;
 ; player_tl.y >= 200 - PLAYER_HEIGHT && player_tl.y <= 200 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$B8
-	bcc     L2068
+	bcc     L2095
 	cmp     #$D9
-	bcs     L2068
+	bcs     L2095
 ;
 ; if (level_switch == 1) {
 ;
@@ -9770,13 +9808,13 @@ L2063:	lda     _player_tl+3
 ;
 ; } else if (level_switch == 2) {
 ;
-	beq     L2075
+	beq     L20A3
 	cmp     #$02
-	bne     L2068
+	bne     L2095
 ;
 ; start_x = 24; // send top-left
 ;
-L2075:	lda     #$18
+L20A3:	lda     #$18
 	sta     _start_x
 ;
 ; start_y = 40;
@@ -9795,26 +9833,26 @@ L2075:	lda     #$18
 ;
 ; if (player_tl.x >= 208 - PLAYER_WIDTH && player_tl.x <= 208 + PLAYER_WIDTH &&
 ;
-L2068:	lda     _player_tl+3
+L2095:	lda     _player_tl+3
 	cmp     #$C8
-	bcc     L206A
+	bcc     L2097
 	cmp     #$D9
-	bcs     L206A
+	bcs     L2097
 ;
 ; player_tl.y >= 200 - PLAYER_HEIGHT && player_tl.y <= 200 + PLAYER_HEIGHT) {
 ;
 	lda     _player_tl
 	cmp     #$B8
-	bcc     L206A
+	bcc     L2097
 	cmp     #$D9
-	bcc     L206B
-L206A:	rts
+	bcc     L2098
+L2097:	rts
 ;
 ; if (level_switch == 1) {
 ;
-L206B:	lda     _level_switch
+L2098:	lda     _level_switch
 	cmp     #$01
-	bne     L206C
+	bne     L2099
 ;
 ; start_x = 112; // send to middle
 ;
@@ -9836,10 +9874,10 @@ L206B:	lda     _level_switch
 ;
 ; } else if (level_switch == 2) {
 ;
-	jmp     L2048
-L206C:	lda     _level_switch
+	jmp     L2075
+L2099:	lda     _level_switch
 	cmp     #$02
-	bne     L1F08
+	bne     L1F34
 ;
 ; start_x = 24; // send top-left
 ;
@@ -9858,11 +9896,11 @@ L206C:	lda     _level_switch
 ; level_switch = 0;    
 ;
 	lda     #$00
-L2048:	sta     _level_switch
+L2075:	sta     _level_switch
 ;
 ; }
 ;
-L1F08:	rts
+L1F34:	rts
 
 .endproc
 
@@ -10302,13 +10340,13 @@ L1ACD:	jsr     _WaitFrame
 ; if (game_state == Title) {
 ;
 	lda     _game_state
-	bne     L207B
+	bne     L20A9
 ;
 ; if (InputPort1 & BUTTON_START) {
 ;
 	lda     _InputPort1
 	and     #$10
-	beq     L207A
+	beq     L20A8
 ;
 ; timer = 0;
 ;
@@ -10343,19 +10381,19 @@ L1ACD:	jsr     _WaitFrame
 ; Frame_Number = 0;
 ;
 	lda     #$00
-L207A:	sta     _Frame_Number
+L20A8:	sta     _Frame_Number
 ;
 ; if (game_state == Level_Intro) {
 ;
-L207B:	lda     _game_state
+L20A9:	lda     _game_state
 	cmp     #$04
-	bne     L207C
+	bne     L20AA
 ;
 ; if (Frame_Number == 60) { // this runs once every second
 ;
 	lda     _Frame_Number
 	cmp     #$3C
-	bne     L207C
+	bne     L20AA
 ;
 ; ++timer;
 ;
@@ -10424,9 +10462,9 @@ L1AE6:	jsr     _update_time
 ;
 ; if (game_state == Level) {
 ;
-L207C:	lda     _game_state
+L20AA:	lda     _game_state
 	cmp     #$01
-	jne     L2085
+	jne     L20B3
 ;
 ; input_handler();
 ;
@@ -10448,9 +10486,9 @@ L207C:	lda     _game_state
 	sbc     _end_x_max
 	sta     tmp1
 	lda     tmp1
-	beq     L207D
-	bcs     L2082
-L207D:	lda     _player_tl+3
+	beq     L20AB
+	bcs     L20B0
+L20AB:	lda     _player_tl+3
 	clc
 	adc     #$08
 	bcc     L1B01
@@ -10458,7 +10496,7 @@ L207D:	lda     _player_tl+3
 L1B01:	cmp     _end_x_min
 	txa
 	sbc     #$00
-	bcc     L2082
+	bcc     L20B0
 ;
 ; player_tl.y <= end_y_max && player_tl.y + PLAYER_HEIGHT >= end_y_min &&
 ;
@@ -10468,9 +10506,9 @@ L1B01:	cmp     _end_x_min
 	sbc     _end_y_max
 	sta     tmp1
 	lda     tmp1
-	beq     L207E
-	bcs     L2082
-L207E:	lda     _player_tl
+	beq     L20AC
+	bcs     L20B0
+L20AC:	lda     _player_tl
 	clc
 	adc     #$10
 	bcc     L1B02
@@ -10478,13 +10516,13 @@ L207E:	lda     _player_tl
 L1B02:	cmp     _end_y_min
 	txa
 	sbc     #$00
-	bcc     L2082
+	bcc     L20B0
 ;
 ; BUTTON_A & InputPort1)) {
 ;
 	lda     _InputPort1
 	and     #$80
-	beq     L2082
+	beq     L20B0
 ;
 ; game_state = Level_Passed;
 ;
@@ -10494,9 +10532,9 @@ L1B02:	cmp     _end_y_min
 ; } else if (level_status == 2) {
 ;
 	jmp     L1B0F
-L2082:	lda     _level_status
+L20B0:	lda     _level_status
 	cmp     #$02
-	bne     L2083
+	bne     L20B1
 ;
 ; level3_tele_logic();
 ;
@@ -10505,9 +10543,9 @@ L2082:	lda     _level_status
 ; } else if (level_status == 3) {
 ;
 	jmp     L1B0F
-L2083:	lda     _level_status
+L20B1:	lda     _level_status
 	cmp     #$03
-	bne     L2084
+	bne     L20B2
 ;
 ; level4_tele_logic();
 ;
@@ -10516,7 +10554,7 @@ L2083:	lda     _level_status
 ; } else if (level_status == 4) {
 ;
 	jmp     L1B0F
-L2084:	lda     _level_status
+L20B2:	lda     _level_status
 	cmp     #$04
 	bne     L1B0F
 ;
@@ -10530,9 +10568,9 @@ L1B0F:	jsr     _reset_scroll
 ;
 ; if (game_state == Level_Passed) {
 ;
-L2085:	lda     _game_state
+L20B3:	lda     _game_state
 	cmp     #$02
-	jne     L208B
+	jne     L20B9
 ;
 ; player_state = Celebrate;
 ;
@@ -10556,7 +10594,7 @@ L2085:	lda     _game_state
 ;
 	lda     _level_status
 	cmp     #$01
-	bne     L2086
+	bne     L20B4
 ;
 ; start_x = 48; // levelT
 ;
@@ -10588,12 +10626,17 @@ L2085:	lda     _game_state
 	lda     #$C0
 	sta     _end_y_max
 ;
+; level_switch = 0;
+;
+	lda     #$00
+	sta     _level_switch
+;
 ; } else if (level_status == 2) {
 ;
-	jmp     L208A
-L2086:	lda     _level_status
+	jmp     L20B8
+L20B4:	lda     _level_status
 	cmp     #$02
-	bne     L2087
+	bne     L20B5
 ;
 ; start_x = 48; // level 3
 ;
@@ -10612,10 +10655,10 @@ L2086:	lda     _level_status
 ;
 ; } else if (level_status == 3) {
 ;
-	jmp     L208A
-L2087:	lda     _level_status
+	jmp     L20B8
+L20B5:	lda     _level_status
 	cmp     #$03
-	bne     L2088
+	bne     L20B6
 ;
 ; start_x = 48; // level 4
 ;
@@ -10634,10 +10677,10 @@ L2087:	lda     _level_status
 ;
 ; } else if (level_status == 4) {
 ;
-	jmp     L208A
-L2088:	lda     _level_status
+	jmp     L20B8
+L20B6:	lda     _level_status
 	cmp     #$04
-	bne     L2089
+	bne     L20B7
 ;
 ; start_x = 24; // level 5
 ;
@@ -10656,10 +10699,10 @@ L2088:	lda     _level_status
 ;
 ; } else if (level_status == 5) {
 ;
-	jmp     L208A
-L2089:	lda     _level_status
+	jmp     L20B8
+L20B7:	lda     _level_status
 	cmp     #$05
-	bne     L208A
+	bne     L20B8
 ;
 ; game_state = End;
 ;
@@ -10668,9 +10711,9 @@ L2089:	lda     _level_status
 ;
 ; if (game_state != End) {
 ;
-L208A:	lda     _game_state
+L20B8:	lda     _game_state
 	cmp     #$03
-	beq     L208B
+	beq     L20B9
 ;
 ; screen_off();
 ;
@@ -10698,9 +10741,9 @@ L208A:	lda     _game_state
 ;
 ; if (game_state == End) {
 ;
-L208B:	lda     _game_state
+L20B9:	lda     _game_state
 	cmp     #$03
-	bne     L208C
+	bne     L20BB
 ;
 ; input_handler();
 ;
@@ -10713,7 +10756,7 @@ L208B:	lda     _game_state
 ; if (end_drawn == 0) {
 ;
 	lda     _end_drawn
-	bne     L208C
+	bne     L20BA
 ;
 ; draw_end();
 ;
@@ -10737,9 +10780,54 @@ L208B:	lda     _game_state
 ;
 	jsr     _set_player
 ;
+; if (BUTTON_START & InputPort1) {
+;
+L20BA:	lda     _InputPort1
+	and     #$10
+	beq     L20BB
+;
+; game_state = Title;
+;
+	lda     #$00
+	sta     _game_state
+;
+; level_status = 0;
+;
+	sta     _level_status
+;
+; start_x = 112;
+;
+	lda     #$70
+	sta     _start_x
+;
+; start_y = 104;
+;
+	lda     #$68
+	sta     _start_y
+;
+; end_x_min = 144;
+;
+	lda     #$90
+	sta     _end_x_min
+;
+; end_x_max = 160;
+;
+	lda     #$A0
+	sta     _end_x_max
+;
+; end_y_min = 96;
+;
+	lda     #$60
+	sta     _end_y_min
+;
+; end_y_max = 120;
+;
+	lda     #$78
+	sta     _end_y_max
+;
 ; if (game_state != End && Frame_Number == 60) {
 ;
-L208C:	lda     _game_state
+L20BB:	lda     _game_state
 	cmp     #$03
 	jeq     L1ACD
 	lda     _Frame_Number

@@ -198,6 +198,7 @@ int main(void) {
 				end_x_max = 144;
 				end_y_min = 176;
 				end_y_max = 192;
+				level_switch = 0;
 			} else if (level_status == 2) {
 				start_x = 48; // level 3
 				start_y = 88;
@@ -233,6 +234,16 @@ int main(void) {
 				start_x = 40;
 				start_y = 40;
 				set_player();
+			}
+			if (BUTTON_START & InputPort1) {
+				game_state = Title;
+				level_status = 0;
+				start_x = 112;
+				start_y = 104;
+				end_x_min = 144;
+				end_x_max = 160;
+				end_y_min = 96;
+				end_y_max = 120;
 			}
 		}
 
@@ -602,7 +613,7 @@ void level_intro(void) {
 	if (level_status == 0) {
 		reset_scroll();
 		PPU_ADDRESS = NAMETABLE0_HIGH + 0x02;
-		PPU_ADDRESS = NAMETABLE0_LOW  + 0xa8;
+		PPU_ADDRESS = NAMETABLE0_LOW  + 0xa5;
 		PPU_DATA = 'P';
 		PPU_DATA = 'r';
 		PPU_DATA = 'e';
@@ -619,6 +630,12 @@ void level_intro(void) {
 		PPU_DATA = 't';
 		PPU_DATA = 'e';
 		PPU_DATA = 'r';
+		PPU_DATA = ' ';
+		PPU_DATA = 'D';
+		PPU_DATA = 'o';
+		PPU_DATA = 'o';
+		PPU_DATA = 'r';
+		PPU_DATA = 's';
 	}
 	reset_scroll();
 }
@@ -641,6 +658,7 @@ void level3_tele_logic(void) {
 				set_player();
 			} else if (level_switch == 1) {
 				game_state == Level_Passed;
+				level_switch = 0;
 			}
 		}
 		if (player_tl.x >= 184 - PLAYER_WIDTH && player_tl.x <= 184 + PLAYER_WIDTH &&
@@ -657,6 +675,7 @@ void level3_tele_logic(void) {
 				set_player();
 			} else if (level_switch == 2) {
 				game_state = Level_Passed;
+				level_switch = 0;
 			}
 		}
 	}
@@ -726,6 +745,7 @@ void level5_tele_logic(void) {
 			// middle
 			if (level_switch == 3) {
 				game_state = Level_Passed;
+				level_switch = 0;
 			} else {
 				start_x = 24; // send top-left
 				start_y = 40;
