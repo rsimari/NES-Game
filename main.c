@@ -14,18 +14,23 @@
 // include level backgrounds
 #include "Levels/empty.h"
 #include "Levels/level1.h"
-#include "Levels/level2.h"
 #include "Levels/levelT.h"
+#include "Levels/level3.h"
 #include "Levels/level4.h"
 #include "Levels/level5.h"
 #include "Levels/end.h"
 
+// level1, intro
+// level2, maze
+// level3, two exits
+// level4, two exits w/ twist
+// level5, many exits
 const unsigned char * const LEVELS[] = {level1, level2, level3, level4, level5};
 
 // include level collision maps
-#include "Levels/levelT.csv"
 #include "Levels/level1.csv"
-#include "Levels/level2.csv"
+#include "Levels/levelT.csv"
+#include "Levels/level3.csv"
 #include "Levels/level4.csv"
 #include "Levels/level5.csv"
 
@@ -69,10 +74,8 @@ uint8_t blocked;
 uint8_t blocked_top;
 uint8_t blocked_bot;
 
-uint8_t level_switch = 0; // changes where the teles go?
+uint8_t level_switch = 0;
 uint8_t level_target = 0; 
-
-uint8_t level4_teles[] = {23*8, 9*8, 23*8, 14*8}; // locations for the teles
 
 uint8_t start_x;    // coordinates of where to start on level
 uint8_t start_y;
@@ -98,7 +101,9 @@ void collision_check_vert(void);
 void collision_check_horiz(void);
 void passed_level(void);
 void level_intro(void);
+void level3_tele_logic(void);
 void level4_tele_logic(void);
+void level5_tele_logic(void);
 void draw_title(void);
 void clear_nametable(void);
 void draw_end(void);
@@ -162,13 +167,19 @@ int main(void) {
 		if (game_state == Level) {
 			input_handler();
 			update_sprite();
+			// for simple levels
 			if ((player_tl.x <= end_x_max && player_tl.x + PLAYER_WIDTH >= end_x_min && 
 				player_tl.y <= end_y_max && player_tl.y + PLAYER_HEIGHT >= end_y_min &&
-				BUTTON_A & InputPort1 && level_switch == level_target)) {
+				BUTTON_A & InputPort1)) {
 				game_state = Level_Passed;
-			} else if (level_status == 3) {
+			// for levels with teleporters
+			} else if (level_status == 2) {
 				// check for teleports
+				level3_tele_logic();
+			} else if (level_status == 3) {
 				level4_tele_logic();
+			} else if (level_status == 4) {
+				level5_tele_logic();
 			}
 		}
 
@@ -179,43 +190,39 @@ int main(void) {
 			passed_level();
 			// set new end_x ... and player position for next level
 			if (level_status == 1) {
-				game_state = End;
-				start_x = 50;
-				start_y = 50;
+				start_x = 50; // levelT
+				start_y = 66;
 				end_x_min = 50;
 				end_x_max = 50;
-				end_y_min = 50;
-				end_y_max = 50;
+				end_y_min = 60;
+				end_y_max = 70;
 			} else if (level_status == 2) {
-				start_x = 50;
-				start_y = 50;
-				end_x_min = 50;
-				end_x_max = 50;
-				end_y_min = 50;
-				end_y_max = 50;
-			} else if (level_status == 3) {
-				start_x = 48;
+				start_x = 48; // level 3
 				start_y = 88;
-				end_x_min = 184;
-				end_x_max = 200;
-				end_y_min = 72;
-				end_y_max = 88;
-				level_target = 1;
+				level_switch = 0;
+			} else if (level_status == 3) {
+				start_x = 48; // level 4
+				start_y = 88;
+				level_switch = 0;
 			} else if (level_status == 4) {
-				start_x = 24;
+				start_x = 24; // level 5
 				start_y = 40;
 				end_x_min = 184;
 				end_x_max = 192;
 				end_y_min = 112;
 				end_y_max = 120;
+			} else if (level_status == 5) {
+				game_state = End;
 			}
-			// draw the next level intro
-			screen_off();
-			clear_nametable();
-			Wait_Vblank();
-			screen_on();
-			level_intro();
-			set_player();
+			if (game_state != End) {
+				// draw the next level intro
+				screen_off();
+				clear_nametable();
+				Wait_Vblank();
+				screen_on();
+				level_intro();
+				set_player();
+			}
 		}
 
 		if (game_state == End) {
@@ -596,31 +603,67 @@ void clear_nametable(void) {
 	reset_scroll();
 }
 
-void level4_tele_logic(void) {
-	if (InputPort1 & BUTTON_A && ~InputPort1Prev & 0x7f) {
-		if (player_tl.x >= level4_teles[0] && player_tl.x <= level4_teles[0] + PLAYER_WIDTH &&
-			player_tl.y >= level4_teles[1] && player_tl.y <= level4_teles[1] + PLAYER_HEIGHT) {
-			// if (level_switch == 0) {
-			// 	start_x = 48;
-			// 	start_y = 88;
-			// 	init_player();
-			// 	level_switch = 1;
-			// } else if (level_switch == 1) {
-			// 	game_state == Level_Passed;
-			// }
+void level3_tele_logic(void) {
+	if (InputPort1 & BUTTON_A) {
+		if (player_tl.x >= 184 && player_tl.x <= 184 + PLAYER_WIDTH &&
+			player_tl.y >= 72 && player_tl.y <= 72 + PLAYER_HEIGHT) {
+			if (level_switch == 0 || level_status == 2) {
+				start_x = 48;
+				start_y = 88;
+				set_player();
+				level_switch = 2;
+			} else if (level_switch == 1) {
+				game_state == Level_Passed;
+			}
 		}
-		// } else if (player_tl.x >= level4_teles[2] && player_tl.x <= level4_teles[2] + PLAYER_WIDTH &&
-		// 	player_tl.y >= level4_teles[3] && player_tl.y <= level4_teles[3] + PLAYER_HEIGHT) {
-		// 	if (level_switch == 0) {
-		// 		start_x = 48;
-		// 		start_y = 88;
-		// 		init_player();
-		// 		level_switch = 1;
-		// 	} else if (level_switch == 1) {
-				
-		// 	}
-		// }
+		if (player_tl.x >= 184 && player_tl.x <= 184 + PLAYER_WIDTH &&
+			player_tl.y >= 104 && player_tl.y <= 120 + PLAYER_HEIGHT) {
+			if (level_switch == 0) {
+				start_x = 48;
+				start_y = 88;
+				level_switch = 1;
+				set_player();
+			} else if (level_switch == 1) {
+				start_x = 48;
+				start_y = 88;
+				set_player();
+				level_switch = 2;
+			} else if (level_switch == 2) {
+				game_state = Level_Passed;
+			}
+		}
 	}
+}
+
+void level4_tele_logic(void) {
+	if (InputPort1 & BUTTON_A) {
+		if (player_tl.x >= 184 && player_tl.x <= 184 + PLAYER_WIDTH &&
+			player_tl.y >= 72 && player_tl.y <= 72 + PLAYER_HEIGHT) {
+			if (level_switch == 0 || level_status == 2) {
+				start_x = 48;
+				start_y = 88;
+				set_player();
+				level_switch = 1;
+			} else if (level_switch == 1) {
+				game_state == Level_Passed;
+			}
+		}
+		if (player_tl.x >= 184 && player_tl.x <= 184 + PLAYER_WIDTH &&
+			player_tl.y >= 104 && player_tl.y <= 120 + PLAYER_HEIGHT) {
+			if (level_switch == 0 || level_switch == 1) {
+				start_x = 48;
+				start_y = 88;
+				set_player();
+				level_switch = 2;
+			} else if (level_switch == 2) {
+				game_state = Level_Passed;
+			}
+		}
+	}
+}
+
+void level5_tele_logic(void) {
+
 }
 
 void draw_title(void) {
